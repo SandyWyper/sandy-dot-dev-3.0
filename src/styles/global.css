@@ -1,2 +1,12 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @plugin "daisyui";
+
+@plugin "daisyui" {
+  themes: minimal --default, forest --prefersdark;
+  /* root: ":root";
+    include: ;
+    exclude: ;
+    prefix: ;
+    logs: true; */
+}
