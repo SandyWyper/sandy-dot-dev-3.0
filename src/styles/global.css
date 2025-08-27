@@ -3,10 +3,14 @@
 @plugin "daisyui";
 
 @plugin "daisyui" {
-  themes: minimal --default, forest --prefersdark;
+  themes: lofi --default, forest --prefersdark;
   /* root: ":root";
     include: ;
     exclude: ;
     prefix: ;
     logs: true; */
+}
+
+html {
+  font-family: "Courier Prime", monospace;
 }
