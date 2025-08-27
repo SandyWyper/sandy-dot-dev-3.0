@@ -1,5 +1,5 @@
 ---
-posttype: "projects"
+# posttype: "projects"
 date: "2020-02-01"
 title: "Banner Time"
 description: "I created a JQuery plugin that injects sale or announcement banners for a scheduled time. Simply include the JavaScript file below your JQuery script tag, and the 'Banner' object will be available to initiate."
@@ -57,7 +57,7 @@ Say you want to show some sale banners at the top of your site like [this](https
       desktop: ["3 Days Until Xmas", "Shop now"],
       mobile: ["3 Days To Go!", "Xmas time!"],
     },
-  }
+  };
   const secondBanner = {
     startTime: [2019, 11, 23],
     endTime: [2019, 11, 24],
@@ -65,7 +65,7 @@ Say you want to show some sale banners at the top of your site like [this](https
       desktop: ["2 Days Until Xmas", "Shop now"],
       mobile: ["2 Days To Go!", "Xmas time!"],
     },
-  }
+  };
   const thirdBanner = {
     startTime: [2019, 11, 24],
     endTime: [2019, 11, 25],
@@ -73,9 +73,9 @@ Say you want to show some sale banners at the top of your site like [this](https
       desktop: ["1 Day Until Xmas", "Shop now"],
       mobile: ["1 Day To Go!", "Delivery NOT guaranteed!"],
     },
-  }
+  };
 
-  const myXmasBanner = new Banner(firstBanner, secondBanner, thirdBanner)
+  const myXmasBanner = new Banner(firstBanner, secondBanner, thirdBanner);
 </script>
 ```
 

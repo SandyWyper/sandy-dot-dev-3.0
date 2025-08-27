@@ -1,5 +1,5 @@
 ---
-posttype: "projects"
+# posttype: "projects"
 date: "2020-05-04"
 title: "MERN Stack Lists App"
 description: "MongoDB Atlas database, with CRUD actions handled by a Node.js back-end, using Express and Mongoose.  Client side code is built up from create-react-app, react-strap components and all glued together with Redux.  This web-app uses Json Web Token and bcrypt.js for user login and authentication, so you can write, edit and read your lists from anywhere."
@@ -48,8 +48,8 @@ At first I didn't see the reason for having the CRUD actions (_Create, Read, Upd
 The beauty of MongDB is that it stores it's data in an object, which is key to JavaScript so makes perfect sense to me. Below is the _user-model_ that is used every time you want to create a new user. The information is sent to the sever from the user, parsed using the _Schema()_ method provided by mongoose, then sent to MongoDB Atlas.
 
 ```javascript
-const mongoose = require("mongoose")
-const Schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
 // Create Schema
 const UserSchema = new Schema({
@@ -70,9 +70,9 @@ const UserSchema = new Schema({
     type: Date,
     default: Date.now,
   },
-})
+});
 
-module.exports = User = mongoose.model("user", UserSchema)
+module.exports = User = mongoose.model("user", UserSchema);
 ```
 
 ### Redux
@@ -91,12 +91,12 @@ The **Store** holds your state but unlike traditional React components the state
 Take this **Action** function.
 
 ```javascript
-export const getLists = userID => (dispatch, getState) => {
-  dispatch(setListsLoading())
+export const getLists = (userID) => (dispatch, getState) => {
+  dispatch(setListsLoading());
 
   axios
     .get(`/api/lists/${userID}`, tokenConfig(getState))
-    .then(res => {
+    .then((res) => {
       res.data.length > 0
         ? dispatch({
             type: LISTS_LOADED,
@@ -104,12 +104,12 @@ export const getLists = userID => (dispatch, getState) => {
           })
         : dispatch({
             type: LISTS_EMPTY,
-          })
+          });
     })
-    .catch(err =>
+    .catch((err) =>
       dispatch(returnErrors(err.response.data, err.response.status))
-    )
-}
+    );
+};
 ```
 
 This could then be called in the component like `props.getLists()`. You see at the top of this function setListsLoading() is passed to the dispatch() method? Every **Action** gets dispatched to the **Reducer**.
@@ -126,14 +126,14 @@ import {
   LOGOUT_SUCCESS,
   REGISTER_SUCCESS,
   REGISTER_FAIL,
-} from "../actions/types"
+} from "../actions/types";
 
 const initialState = {
   token: localStorage.getItem("token"),
   isAuthenticated: false,
   isLoading: false,
   user: null,
-}
+};
 
 export default function (state = initialState, action) {
   switch (action.type) {
@@ -141,37 +141,37 @@ export default function (state = initialState, action) {
       return {
         ...state,
         isLoading: true,
-      }
+      };
     case USER_LOADED:
       return {
         ...state,
         isAuthenticated: true,
         isLoading: false,
         user: action.payload,
-      }
+      };
     case LOGIN_SUCCESS:
     case REGISTER_SUCCESS:
-      localStorage.setItem("token", action.payload.token)
+      localStorage.setItem("token", action.payload.token);
       return {
         ...state,
         ...action.payload,
         isAuthenticated: true,
         isLoading: false,
-      }
+      };
     case AUTH_ERROR:
     case LOGIN_FAIL:
     case LOGOUT_SUCCESS:
     case REGISTER_FAIL:
-      localStorage.removeItem("token")
+      localStorage.removeItem("token");
       return {
         ...state,
         token: null,
         user: null,
         isAuthenticated: false,
         isLoading: false,
-      }
+      };
     default:
-      return state
+      return state;
   }
 }
 ```

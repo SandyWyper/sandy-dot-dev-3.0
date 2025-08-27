@@ -1,5 +1,5 @@
 ---
-posttype: "projects"
+# posttype: "projects"
 date: "2020-04-06"
 title: "High-5!"
 description: "Use the Google Maps APIs to search for specific businesses within a given search radius and rank them by user rating.  This web-app utilises the maps, places and goecode libraries. Also the autocomplete api from the places library for text input."
@@ -42,17 +42,17 @@ When you make the initial call to the Maps API, you pass an object with some key
 When you initiate a Google Maps instance, other methods become available. You can then query for 'places' a certain search radius from a location of a certain business type. In the example below, 'searchRadius' and 'establishmentType' are variables set from the user input.
 
 ```javascript
-let latitude = parseFloat(location.coords.lat)
-let longitude = parseFloat(location.coords.lng)
-let coords = new google.maps.LatLng(latitude, longitude)
+let latitude = parseFloat(location.coords.lat);
+let longitude = parseFloat(location.coords.lng);
+let coords = new google.maps.LatLng(latitude, longitude);
 // sets parameters for places service search
 const request = {
   location: coords, //   center of search coordinates
   radius: searchRadius, //   radius of the search in meters
   type: establishmentType, //   type of establishment to search for
-}
-let service = new google.maps.places.PlacesService(map)
-service.nearbySearch(request, searchPlaces)
+};
+let service = new google.maps.places.PlacesService(map);
+service.nearbySearch(request, searchPlaces);
 ```
 
 The data received contains a lot of the data we need, but not all of it. First though, we can extract the average rating, and number of ratings. We use to top 5 rated, out of a possible 60, so long as it has more than 5 reviews. Then we can then perform another method on the Place library, `getDetails()` on only the 5 business we want details for using each one's unique place id.
@@ -74,9 +74,9 @@ topFive.forEach(function (shop) {
       "rating",
       "review",
     ],
-  }
-  service.getDetails(request, addResultToArray)
-})
+  };
+  service.getDetails(request, addResultToArray);
+});
 ```
 
 The results of this don't always come back in the order they were sent, because each request is just sent out there one after another and then returned when they have been processed. So you have to send them all, wait till they are all in, sort again, and only then display the results. (perhaps you could _await_ each call before sending the next, but I feel this could slow it down a touch.)

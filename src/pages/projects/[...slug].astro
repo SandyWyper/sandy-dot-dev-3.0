@@ -1,0 +1,77 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+
+export async function getStaticPaths() {
+  const allProjects = await getCollection("projects");
+  return allProjects.map((entry: { slug: string }) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"projects">;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const { data } = entry;
+---
+
+<Layout>
+  <div class="">
+    <div>
+      <div>
+        <!-- breadcrumbs -->
+        <div>
+          <a href="/projects">Projects</a>
+          <span class="mx-2">/</span>
+          <span>{data.title}</span>
+        </div>
+        <div>
+          <Image
+            src={data.cover}
+            alt={data.coverAlt ?? `${data.title} screenshot`}
+            class=""
+            widths={[400, 500, 600, 800, 900, 1050, 1300]}
+            sizes={`(min-width: 1024px) 50vw, 100vw`}
+          />
+        </div>
+      </div>
+
+      <div>
+        <div class="lg:pr-8">
+          <p class="mb-4 text-sm font-light leading-none">
+            Case studies <span class="font-extrabold">/ {data.title}</span>
+          </p>
+          <p class="mb-8">{data.description}</p>
+        </div>
+      </div>
+      <!-- tags -->
+      <ul class="list-disc pl-4">
+        {data.tags && data.tags.map((tag: string) => <li class="">{tag}</li>)}
+      </ul>
+
+      {
+        data.live && (
+          <a href={data.live} target="_blank" class="btn">
+            Live
+          </a>
+        )
+      }
+      {
+        data.repository && (
+          <a href={data.repository} target="_blank" class="btn">
+            Code
+          </a>
+        )
+      }
+    </div>
+  </div>
+  <div class="">
+    <Content />
+  </div>
+</Layout>

@@ -1,5 +1,5 @@
 ---
-posttype: "projects"
+# posttype: "projects"
 date: "2019-01-01"
 title: "Roman Numeral Converter PWA"
 description: "Convert Roman numerals to numbers, or vice versa.  This is a progressive web app (PWA) and can be installed to your phone or desktop computer.  Although it is served via a traditional URL through a browser, you can then use it when off-line and it takes the appearance of a native app rather than a web page in a browser."
@@ -49,28 +49,28 @@ function switchToNumerals(num) {
   //create variable that will hold the numerals for values over 4000 and values
   //less than 4000. so that when displaying them, an 'overscore' can show that
   //the value is a multiple of 1000.
-  let answer = [[], []]
+  let answer = [[], []];
 
   //work through the number and numeral arrays - subtracting the working amount
   //and adding the numerals to the answer array.
   numberArr.forEach(function (amount, i) {
     while (num >= amount && num >= 4000) {
-      answer[0] += romanArr[i]
-      num -= numberArr[i]
+      answer[0] += romanArr[i];
+      num -= numberArr[i];
     }
     while (num >= amount && num < 4000) {
-      answer[1] += romanArr[i]
-      num -= amount
+      answer[1] += romanArr[i];
+      num -= amount;
     }
-  })
-  return answer
+  });
+  return answer;
 }
 
 //displays the result on the page only if the input is a number.
 function showResult1(number, result) {
   if (number > 0) {
-    let displayResults = `<p>${number} = <span style="text-decoration: overline">${result[0]}</span>${result[1]}</p>`
-    document.querySelector("#results").innerHTML = displayResults
+    let displayResults = `<p>${number} = <span style="text-decoration: overline">${result[0]}</span>${result[1]}</p>`;
+    document.querySelector("#results").innerHTML = displayResults;
   }
 }
 ```
@@ -84,14 +84,14 @@ This function sets about the order of processing the user submitted string.
 function numeralsToNumbers(input) {
   if (checkForNumerals(input)) {
     //change numeral string into an array of letters
-    let splitNumerals = breakAndCapitalise(input)
+    let splitNumerals = breakAndCapitalise(input);
     //pair any numerals that belong together
-    let orderedNumerals = pairNumerals(splitNumerals)
+    let orderedNumerals = pairNumerals(splitNumerals);
     //check to see that numerals are in a valid order
     if (checkNumeralOrder(orderedNumerals)) {
-      let convertedAmount = changeNumeralsToNumbers(orderedNumerals)
+      let convertedAmount = changeNumeralsToNumbers(orderedNumerals);
 
-      showResult2(input.toUpperCase(), convertedAmount)
+      showResult2(input.toUpperCase(), convertedAmount);
     }
   }
 }
@@ -103,13 +103,13 @@ function numeralsToNumbers(input) {
 // gets the numerals from the input field
 function checkForNumerals(input) {
   //regex test for Roman Numerals
-  const numeralRegex = /^[mdclxvi]*$/gi
+  const numeralRegex = /^[mdclxvi]*$/gi;
   if (!numeralRegex.test(input)) {
-    alert("Please enter a valid roman numeral or number.")
-    document.getElementById("input-field").value = ""
-    return false
+    alert("Please enter a valid roman numeral or number.");
+    document.getElementById("input-field").value = "";
+    return false;
   } else {
-    return true
+    return true;
   }
 }
 ```
@@ -119,7 +119,7 @@ function checkForNumerals(input) {
 ```javascript
 //change numeral string into an array of letters
 function breakAndCapitalise(rom) {
-  return rom.toUpperCase().split("")
+  return rom.toUpperCase().split("");
 }
 ```
 
@@ -128,7 +128,7 @@ function breakAndCapitalise(rom) {
 ```javascript
 //pair numerals that belong together
 function pairNumerals(arr) {
-  let filteredArray = []
+  let filteredArray = [];
 
   for (let i = 0; i < arr.length; i++) {
     switch (arr[i]) {
@@ -136,35 +136,35 @@ function pairNumerals(arr) {
       case "D":
       case "L":
       case "V":
-        filteredArray.push(arr[i])
-        break
+        filteredArray.push(arr[i]);
+        break;
       case "C":
         if (arr[i + 1] === "M" || arr[i + 1] === "D") {
-          filteredArray.push(arr[i] + arr[i + 1])
-          i++
+          filteredArray.push(arr[i] + arr[i + 1]);
+          i++;
         } else {
-          filteredArray.push(arr[i])
+          filteredArray.push(arr[i]);
         }
-        break
+        break;
       case "X":
         if (arr[i + 1] === "C" || arr[i + 1] === "L") {
-          filteredArray.push(arr[i] + arr[i + 1])
-          i++
+          filteredArray.push(arr[i] + arr[i + 1]);
+          i++;
         } else {
-          filteredArray.push(arr[i])
+          filteredArray.push(arr[i]);
         }
-        break
+        break;
       case "I":
         if (arr[i + 1] === "X" || arr[i + 1] === "V") {
-          filteredArray.push(arr[i] + arr[i + 1])
-          i++
+          filteredArray.push(arr[i] + arr[i + 1]);
+          i++;
         } else {
-          filteredArray.push(arr[i])
+          filteredArray.push(arr[i]);
         }
-        break
+        break;
     }
   }
-  return filteredArray
+  return filteredArray;
 }
 ```
 
