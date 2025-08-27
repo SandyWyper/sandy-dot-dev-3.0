@@ -1,3 +1,11 @@
+---
+import { getCollection } from "astro:content";
+import ProjectTile from "./ProjectTile.astro";
+
+const allProjects = await getCollection("projects");
+---
+
 <section>
   <h2>Projects</h2>
+  {allProjects.map((item: object) => <ProjectTile item={item} />)}
 </section>

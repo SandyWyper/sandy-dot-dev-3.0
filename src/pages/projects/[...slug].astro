@@ -24,34 +24,32 @@ const { data } = entry;
 <Layout>
   <div class="">
     <div>
-      <div>
-        <!-- breadcrumbs -->
-        <div>
+      <!-- breadcrumbs -->
+      <!-- <div>
           <a href="/projects">Projects</a>
           <span class="mx-2">/</span>
           <span>{data.title}</span>
-        </div>
-        <div>
-          <Image
-            src={data.cover}
-            alt={data.coverAlt ?? `${data.title} screenshot`}
-            class=""
-            widths={[400, 500, 600, 800, 900, 1050, 1300]}
-            sizes={`(min-width: 1024px) 50vw, 100vw`}
-          />
-        </div>
+        </div> -->
+      <div>
+        <Image
+          src={data.cover}
+          alt={data.coverAlt ?? `${data.title} screenshot`}
+          class=""
+          widths={[400, 500, 600, 800, 900, 1050, 1300]}
+          sizes={`(min-width: 1024px) 50vw, 100vw`}
+        />
       </div>
 
       <div>
-        <div class="lg:pr-8">
-          <p class="mb-4 text-sm font-light leading-none">
+        <div>
+          <p>
             Case studies <span class="font-extrabold">/ {data.title}</span>
           </p>
-          <p class="mb-8">{data.description}</p>
+          <p>{data.description}</p>
         </div>
       </div>
       <!-- tags -->
-      <ul class="list-disc pl-4">
+      <ul class="">
         {data.tags && data.tags.map((tag: string) => <li class="">{tag}</li>)}
       </ul>
 
@@ -71,7 +69,7 @@ const { data } = entry;
       }
     </div>
   </div>
-  <div class="">
+  <div>
     <Content />
   </div>
 </Layout>
