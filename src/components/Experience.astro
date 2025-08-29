@@ -1,12 +1,17 @@
 ---
 import { getCollection } from "astro:content";
 import WorkTile from "./WorkTile.astro";
-
+import Tick from "../assets/svgs/tick.svg";
 const allWorkExamples = await getCollection("work");
 ---
 
 <section>
   <h2>Experience</h2>
+  <ul class="">
+    <li>
+      <p>2025</p>
+    </li>
+  </ul>
   <div>
     {allWorkExamples.map((item: object) => <WorkTile item={item} />)}
   </div>
