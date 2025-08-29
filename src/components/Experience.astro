@@ -1,3 +1,13 @@
+---
+import { getCollection } from "astro:content";
+import WorkTile from "./WorkTile.astro";
+
+const allWorkExamples = await getCollection("work");
+---
+
 <section>
   <h2>Experience</h2>
+  <div>
+    {allWorkExamples.map((item: object) => <WorkTile item={item} />)}
+  </div>
 </section>

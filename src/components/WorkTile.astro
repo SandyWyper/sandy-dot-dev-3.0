@@ -1,0 +1,10 @@
+---
+const { item } = Astro.props;
+const { data } = item;
+---
+
+<div>
+  <h2>{data.title}</h2>
+  <p>{data.shortDescription.slice(0, 100)}&nbsp;...</p>
+  <a href={`/work/${item.slug}`}>Read more</a>
+</div>
