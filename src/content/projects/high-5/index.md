@@ -28,7 +28,7 @@ live: "https://sandywyper.github.io/mop-chop/"
 
 Of course, you could just type into google what you are looking for and be presented with the same information. This is more an exercise in utilising and customising all the pieces of the puzzle.
 
-![High-5 in action](/high-5-demo.gif)
+![High-5 in action](high-5-demo.gif)
 
 Building this taught me a lot, and to go through every step could get a little laborious, so I'll just break it down into a few key takeaways.
 

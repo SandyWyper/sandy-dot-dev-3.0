@@ -1,0 +1,79 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import { Image } from "astro:assets";
+
+export async function getStaticPaths() {
+  const allWorkExamples = await getCollection("work");
+  return allWorkExamples.map((entry: { slug: string }) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"work">;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+const { data } = entry;
+---
+
+<Layout title={data.title} description={data.shortDescription}>
+  <section class="">
+    <div class="">
+      <div class="">
+        <div class="">
+          <Image
+            src={data.image}
+            alt={`${data.title} screenshot`}
+            class=""
+            widths={[400, 500, 600, 800, 900, 1050, 1300]}
+            sizes={`(min-width: 1024px) 50vw, 100vw`}
+          />
+        </div>
+      </div>
+
+      <div
+        class="flex flex-col justify-between rounded-lg bg-background3 p-4 lg:mr-8 lg:w-1/2 lg:p-8"
+      >
+        <div class="lg:pr-8">
+          <p class="mb-4 text-sm font-light leading-none">
+            Case studies <span class="font-extrabold">/ {data.title}</span>
+          </p>
+          <p class="mb-8">{data.shortDescription}</p>
+        </div>
+        <div class="grid grid-cols-2">
+          <!-- tags -->
+          <ul class="list-disc pl-4">
+            {
+              data.tags &&
+                data.tags.map((tag: string) => (
+                  <li class="mb-2 mr-2 whitespace-nowrap rounded-sm text-sm font-medium leading-none">
+                    {tag}
+                  </li>
+                ))
+            }
+          </ul>
+
+          {
+            data.url && (
+              <a
+                href={data.url}
+                target="_blank"
+                class="h-max w-max self-end justify-self-end rounded-lg border-2 border-action px-4 py-2 text-lg font-black !no-underline shadow"
+              >
+                Live
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+    <div class="markdown mx-auto pt-8">
+      <Content />
+    </div>
+  </section>
+</Layout>

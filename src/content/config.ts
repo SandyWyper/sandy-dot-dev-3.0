@@ -16,6 +16,20 @@ const projects = defineCollection({
     }),
 });
 
+const workExamples = defineCollection({
+  type: "content",
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      shortDescription: z.string().optional(),
+      url: z.string().url().optional(),
+      image: image(),
+      tags: z.array(z.string()).optional(),
+      thumb: image(),
+    }),
+});
+
 export const collections = {
   projects,
+  work: workExamples,
 };
