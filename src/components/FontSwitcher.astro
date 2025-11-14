@@ -1,0 +1,161 @@
+---
+// Font configuration
+const fonts = [
+  {
+    name: "Courier Prime",
+    family: "Courier Prime",
+    url: "https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap",
+  },
+  {
+    name: "Major Mono",
+    family: "Major Mono Display",
+    url: "https://fonts.googleapis.com/css2?family=Major+Mono+Display&display=swap",
+  },
+  {
+    name: "Turret Road",
+    family: "Turret Road",
+    url: "https://fonts.googleapis.com/css2?family=Turret+Road:wght@200;300;400;500;700;800&display=swap",
+  },
+  {
+    name: "Tilt Neon",
+    family: "Tilt Neon",
+    url: "https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap",
+  },
+  {
+    name: "Space Mono",
+    family: "Space Mono",
+    url: "https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap",
+  },
+
+  {
+    name: "Syncopate",
+    family: "Syncopate",
+    url: "https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&display=swap",
+  },
+  {
+    name: "Wallpoet",
+    family: "Wallpoet",
+    url: "https://fonts.googleapis.com/css2?family=Wallpoet&display=swap",
+  },
+];
+---
+
+<div class="fixed top-4 right-4 z-[1000] sm:top-2 sm:right-2">
+  <button
+    id="font-switcher-btn"
+    class="btn btn-primary gap-2 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0"
+    aria-label="Switch font"
+  >
+    <span class="font-name text-xl min-w-8 text-center font-bold">Aa</span>
+    <span class="loading loading-spinner loading-sm hidden" aria-hidden="true"
+    ></span>
+  </button>
+</div>
+
+<script define:vars={{ fonts }}>
+  let currentFontIndex = 0;
+  const loadedFonts = new Set();
+  const btn = document.getElementById("font-switcher-btn");
+  const fontNameSpan = btn.querySelector(".font-name");
+  const spinner = btn.querySelector(".loading-spinner");
+
+  // Mark the initial font as loaded (it's already in the HTML)
+  loadedFonts.add(fonts[0].url);
+
+  function setLoading(isLoading) {
+    if (isLoading) {
+      btn.disabled = true;
+      btn.classList.add("btn-disabled");
+      spinner.classList.remove("hidden");
+      spinner.classList.add("inline-block");
+    } else {
+      btn.disabled = false;
+      btn.classList.remove("btn-disabled");
+      spinner.classList.add("hidden");
+      spinner.classList.remove("inline-block");
+    }
+  }
+
+  function loadFont(fontUrl) {
+    return new Promise((resolve, reject) => {
+      // Check if font is already loaded
+      if (loadedFonts.has(fontUrl)) {
+        resolve();
+        return;
+      }
+
+      // Create link element for font
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = fontUrl;
+
+      link.onload = () => {
+        loadedFonts.add(fontUrl);
+        resolve();
+      };
+
+      link.onerror = () => {
+        reject(new Error("Failed to load font"));
+      };
+
+      document.head.appendChild(link);
+    });
+  }
+
+  function applyFont(fontFamily) {
+    document.body.style.fontFamily = `"${fontFamily}", monospace`;
+  }
+
+  async function switchFont() {
+    // Move to next font
+    currentFontIndex = (currentFontIndex + 1) % fonts.length;
+    const nextFont = fonts[currentFontIndex];
+
+    setLoading(true);
+
+    try {
+      await loadFont(nextFont.url);
+
+      // Small delay to ensure font is rendered
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      applyFont(nextFont.family);
+      fontNameSpan.textContent = nextFont.name;
+
+      // Store preference
+      localStorage.setItem("preferred-font", currentFontIndex.toString());
+    } catch (error) {
+      console.error("Failed to load font:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Initialize with saved preference
+  function init() {
+    const savedIndex = localStorage.getItem("preferred-font");
+    if (savedIndex !== null) {
+      const index = parseInt(savedIndex, 10);
+      if (index >= 0 && index < fonts.length) {
+        currentFontIndex = index;
+        const font = fonts[currentFontIndex];
+        applyFont(font.family);
+        fontNameSpan.textContent = font.name;
+
+        // Load the font in background if not already loaded
+        if (!loadedFonts.has(font.url)) {
+          loadFont(font.url).catch(console.error);
+        }
+      }
+    } else {
+      // Apply default font
+      applyFont(fonts[0].family);
+      fontNameSpan.textContent = fonts[0].name;
+    }
+  }
+
+  btn.addEventListener("click", switchFont);
+
+  // Initialize on load
+  init();
+</script>
