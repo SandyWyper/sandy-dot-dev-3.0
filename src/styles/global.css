@@ -3,14 +3,23 @@
 @plugin "daisyui";
 
 @plugin "daisyui" {
-  themes: lofi --default, forest --prefersdark;
-  /* root: ":root";
-    include: ;
-    exclude: ;
-    prefix: ;
-    logs: true; */
+  themes: all;
 }
 
 html {
   font-family: "Courier Prime", monospace;
+}
+
+/* Links use accent color */
+a:not(.btn) {
+  @apply text-secondary underline;
+}
+
+a:not(.btn):hover {
+  @apply text-secondary/80;
+}
+
+h1,
+h2 {
+  @apply text-primary;
 }

@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import FontSwitcher from "../components/FontSwitcher.astro";
+import Header from "../components/Header.astro";
 ---
 
 <!doctype html>
@@ -19,9 +19,63 @@ import FontSwitcher from "../components/FontSwitcher.astro";
       href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap"
       rel="stylesheet"
     />
+    <script is:inline>
+      // Initialize theme immediately to prevent flash
+      (function () {
+        const themes = [
+          "light",
+          "dark",
+          "cupcake",
+          "bumblebee",
+          "emerald",
+          "corporate",
+          "synthwave",
+          "retro",
+          "cyberpunk",
+          "valentine",
+          "halloween",
+          "garden",
+          "forest",
+          "aqua",
+          "lofi",
+          "pastel",
+          "fantasy",
+          "wireframe",
+          "black",
+          "luxury",
+          "dracula",
+          "cmyk",
+          "autumn",
+          "business",
+          "acid",
+          "lemonade",
+          "night",
+          "coffee",
+          "winter",
+          "dim",
+          "nord",
+          "sunset",
+          "caramellatte",
+          "abyss",
+          "silk",
+        ];
+        const savedTheme = localStorage.getItem("preferred-theme");
+        if (savedTheme && themes.includes(savedTheme)) {
+          document.documentElement.setAttribute("data-theme", savedTheme);
+        } else {
+          const prefersDark = window.matchMedia(
+            "(prefers-color-scheme: dark)"
+          ).matches;
+          document.documentElement.setAttribute(
+            "data-theme",
+            prefersDark ? "dark" : "light"
+          );
+        }
+      })();
+    </script>
   </head>
-  <body class="prose px-4 lg:px-12 max-w-screen bg-gray-900">
-    <FontSwitcher />
+  <body class="prose px-4 lg:px-12 max-w-screen bg-base-100 text-base-content">
+    <Header />
     <slot />
   </body>
 </html>
