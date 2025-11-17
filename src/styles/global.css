@@ -12,11 +12,11 @@ html {
 
 /* Links use accent color */
 a:not(.btn) {
-  @apply text-secondary underline;
+  @apply text-primary underline;
 }
 
 a:not(.btn):hover {
-  @apply text-secondary/80;
+  @apply text-primary/80;
 }
 
 h1,

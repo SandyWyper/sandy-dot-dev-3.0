@@ -2,43 +2,76 @@
 import FontSwitcher from "./FontSwitcher.astro";
 ---
 
-<header class="w-full border-b border-secondary py-2 px-4 lg:px-12">
-  <div class="flex items-center justify-end gap-2">
-    <!-- Font Size Switcher -->
-    <div class="flex items-center gap-1 border border-secondary rounded-lg px-1">
-      <button
-        id="font-size-decrease-btn"
-        class="btn btn-sm btn-primary btn-square min-h-0 h-7 w-7 p-0"
-        aria-label="Decrease font size"
-      >
-        <span class="text-sm">−</span>
-      </button>
-      <div class="flex items-baseline gap-0.5 px-2 py-1" id="font-size-display">
-        <span class="text-xs">A</span>
-        <span class="text-sm">A</span>
-        <span class="text-base">A</span>
-      </div>
-      <button
-        id="font-size-increase-btn"
-        class="btn btn-sm btn-primary btn-square min-h-0 h-7 w-7 p-0"
-        aria-label="Increase font size"
-      >
-        <span class="text-sm">+</span>
-      </button>
-    </div>
-
-    <!-- Theme Switcher -->
-    <span class="text-sm">theme: </span>
-    <button
-      id="theme-switcher-btn"
-      class="btn btn-sm btn-primary"
-      aria-label="Switch theme"
+<header class="absolute top-4 right-4 z-50">
+  <!-- Settings Button -->
+  <button
+    id="toolbar-toggle-btn"
+    class="settings-btn border border-primary bg-base-100 p-2 rounded-lg transition-all cursor-pointer"
+    aria-label="Toggle toolbar"
+    aria-expanded="false"
+  >
+    <svg
+      class="settings-icon w-6 h-6 text-accent"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
     >
-      <span id="theme-button-text" class="text-sm"></span>
-    </button>
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
+      ></path>
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+    </svg>
+  </button>
 
-    <!-- Font Switcher -->
-    <FontSwitcher />
+  <!-- Toolbar Content -->
+  <div
+    id="toolbar-content"
+    class="toolbar-content bg-base-300/80 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-tertiary hidden"
+  >
+    <div class="flex flex-col items-start gap-2">
+      <!-- Font Size Switcher -->
+      <div class="flex items-center gap-1 px-1">
+        <button
+          id="font-size-decrease-btn"
+          class="btn btn-sm btn-outline btn-square min-h-0 h-7 w-7 p-0"
+          aria-label="Decrease font size"
+        >
+          <span class="text-sm leading-none">−</span>
+        </button>
+        <div class="flex items-baseline p-2" id="font-size-display">
+          <span class="text-sm">A</span>
+          <span class="text-base">A</span>
+          <span class="text-xl">A</span>
+        </div>
+        <button
+          id="font-size-increase-btn"
+          class="btn btn-sm btn-outline btn-square min-h-0 h-7 w-7 p-0"
+          aria-label="Increase font size"
+        >
+          <span class="text-sm leading-none">+</span>
+        </button>
+      </div>
+
+      <!-- Theme Switcher -->
+      <span class="text-sm">theme: </span>
+      <button
+        id="theme-switcher-btn"
+        class="btn btn-sm btn-outline"
+        aria-label="Switch theme"
+      >
+        <span id="theme-button-text" class="text-sm"></span>
+      </button>
+
+      <!-- Font Switcher -->
+      <FontSwitcher />
+    </div>
   </div>
 </header>
 
@@ -51,7 +84,7 @@ import FontSwitcher from "./FontSwitcher.astro";
     // Find the closest font size in the array
     let closestIndex = 0;
     let minDiff = Math.abs(fontSizes[0] - currentSize);
-    
+
     for (let i = 1; i < fontSizes.length; i++) {
       const diff = Math.abs(fontSizes[i] - currentSize);
       if (diff < minDiff) {
@@ -71,13 +104,17 @@ import FontSwitcher from "./FontSwitcher.astro";
         applyFontSize(fontSizes[currentFontSizeIndex]);
       } else {
         // If saved index is invalid, detect current size
-        const currentSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+        const currentSize = parseFloat(
+          getComputedStyle(document.documentElement).fontSize
+        );
         currentFontSizeIndex = findClosestFontSizeIndex(currentSize);
         applyFontSize(fontSizes[currentFontSizeIndex]);
       }
     } else {
       // Detect current root font size and match to closest
-      const currentSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      const currentSize = parseFloat(
+        getComputedStyle(document.documentElement).fontSize
+      );
       currentFontSizeIndex = findClosestFontSizeIndex(currentSize);
       applyFontSize(fontSizes[currentFontSizeIndex]);
     }
@@ -91,15 +128,18 @@ import FontSwitcher from "./FontSwitcher.astro";
   function updateFontSizeButtons() {
     const decreaseBtn = document.getElementById("font-size-decrease-btn");
     const increaseBtn = document.getElementById("font-size-increase-btn");
-    
+
     if (decreaseBtn) {
       decreaseBtn.disabled = currentFontSizeIndex === 0;
       decreaseBtn.classList.toggle("btn-disabled", currentFontSizeIndex === 0);
     }
-    
+
     if (increaseBtn) {
       increaseBtn.disabled = currentFontSizeIndex === fontSizes.length - 1;
-      increaseBtn.classList.toggle("btn-disabled", currentFontSizeIndex === fontSizes.length - 1);
+      increaseBtn.classList.toggle(
+        "btn-disabled",
+        currentFontSizeIndex === fontSizes.length - 1
+      );
     }
   }
 
@@ -108,7 +148,10 @@ import FontSwitcher from "./FontSwitcher.astro";
       currentFontSizeIndex--;
       const newSize = fontSizes[currentFontSizeIndex];
       applyFontSize(newSize);
-      localStorage.setItem("preferred-font-size", currentFontSizeIndex.toString());
+      localStorage.setItem(
+        "preferred-font-size",
+        currentFontSizeIndex.toString()
+      );
     }
   }
 
@@ -117,18 +160,50 @@ import FontSwitcher from "./FontSwitcher.astro";
       currentFontSizeIndex++;
       const newSize = fontSizes[currentFontSizeIndex];
       applyFontSize(newSize);
-      localStorage.setItem("preferred-font-size", currentFontSizeIndex.toString());
+      localStorage.setItem(
+        "preferred-font-size",
+        currentFontSizeIndex.toString()
+      );
     }
   }
 
   // Theme Switcher - All 35 DaisyUI themes
   const themes = [
-    "light", "dark", "cupcake", "bumblebee", "emerald", "corporate",
-    "synthwave", "retro", "cyberpunk", "valentine", "halloween", "garden",
-    "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe",
-    "black", "luxury", "dracula", "cmyk", "autumn", "business",
-    "acid", "lemonade", "night", "coffee", "winter", "dim",
-    "nord", "sunset", "caramellatte", "abyss", "silk"
+    "light",
+    "dark",
+    "cupcake",
+    "bumblebee",
+    "emerald",
+    "corporate",
+    "synthwave",
+    "retro",
+    "cyberpunk",
+    "valentine",
+    "halloween",
+    "garden",
+    "forest",
+    "aqua",
+    "lofi",
+    "pastel",
+    "fantasy",
+    "wireframe",
+    "black",
+    "luxury",
+    "dracula",
+    "cmyk",
+    "autumn",
+    "business",
+    "acid",
+    "lemonade",
+    "night",
+    "coffee",
+    "winter",
+    "dim",
+    "nord",
+    "sunset",
+    "caramellatte",
+    "abyss",
+    "silk",
   ];
   let currentThemeIndex = 0;
 
@@ -142,7 +217,7 @@ import FontSwitcher from "./FontSwitcher.astro";
     // Read the current theme from the DOM (already set by inline script)
     const currentTheme = getCurrentTheme();
     const index = themes.indexOf(currentTheme);
-    
+
     if (index !== -1) {
       currentThemeIndex = index;
     } else {
@@ -153,14 +228,16 @@ import FontSwitcher from "./FontSwitcher.astro";
         applyTheme(savedTheme);
       } else {
         // Fallback to system preference (default to "dark" or "light")
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)"
+        ).matches;
         const defaultTheme = prefersDark ? "dark" : "light";
         currentThemeIndex = themes.indexOf(defaultTheme);
         if (currentThemeIndex === -1) currentThemeIndex = 0;
         applyTheme(themes[currentThemeIndex]);
       }
     }
-    
+
     // Always update button text to reflect current state
     updateThemeButton();
   }
@@ -184,13 +261,48 @@ import FontSwitcher from "./FontSwitcher.astro";
     localStorage.setItem("preferred-theme", newTheme);
   }
 
+  // Toolbar Toggle Functionality
+  function initToolbar() {
+    const toggleBtn = document.getElementById("toolbar-toggle-btn");
+    const toolbarContent = document.getElementById("toolbar-content");
+    const settingsIcon = toggleBtn?.querySelector(".settings-icon");
+
+    if (!toggleBtn || !toolbarContent) return;
+
+    let isExpanded = false;
+
+    function toggleToolbar() {
+      isExpanded = !isExpanded;
+
+      // Toggle visibility
+      if (isExpanded) {
+        toolbarContent?.classList.remove("hidden");
+        toggleBtn?.setAttribute("aria-expanded", "true");
+        // Rotate settings icon
+        settingsIcon?.classList.add("is-active");
+      } else {
+        toolbarContent?.classList.add("hidden");
+        toggleBtn?.setAttribute("aria-expanded", "false");
+        // Reset settings icon rotation
+        settingsIcon?.classList.remove("is-active");
+      }
+    }
+
+    toggleBtn.addEventListener("click", toggleToolbar);
+  }
+
   // Initialize font size and attach event listeners after DOM is ready
   document.addEventListener("DOMContentLoaded", () => {
     initFontSize();
     initTheme(); // Initialize theme button text after DOM is ready
+    initToolbar(); // Initialize toolbar toggle
 
-    const fontSizeDecreaseBtn = document.getElementById("font-size-decrease-btn");
-    const fontSizeIncreaseBtn = document.getElementById("font-size-increase-btn");
+    const fontSizeDecreaseBtn = document.getElementById(
+      "font-size-decrease-btn"
+    );
+    const fontSizeIncreaseBtn = document.getElementById(
+      "font-size-increase-btn"
+    );
     const themeBtn = document.getElementById("theme-switcher-btn");
 
     if (fontSizeDecreaseBtn) {
@@ -207,3 +319,29 @@ import FontSwitcher from "./FontSwitcher.astro";
   });
 </script>
 
+<style>
+  /* Settings Icon Styling */
+  .settings-btn {
+    color: hsl(var(--p)); /* Primary color for icon */
+  }
+
+  .settings-icon {
+    color: hsl(var(--p)); /* Primary color for stroke */
+    transition: transform 0.3s ease;
+    transform-origin: center;
+  }
+
+  /* Rotate settings icon when active */
+  .settings-icon.is-active {
+    transform: rotate(90deg);
+  }
+
+  /* Toolbar positioning - always expands below (vertical) on both mobile and desktop */
+  .toolbar-content {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 0.5rem;
+    min-width: 200px;
+  }
+</style>
