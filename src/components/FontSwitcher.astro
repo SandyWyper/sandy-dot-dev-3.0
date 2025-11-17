@@ -46,7 +46,7 @@ const fonts = [
     class="btn btn-primary gap-2 shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5 active:translate-y-0"
     aria-label="Switch font"
   >
-    <span class="font-name text-xl min-w-8 text-center font-bold">Aa</span>
+    <span id="font-button-text" class="text-xl min-w-8 text-center font-bold transition-opacity duration-300">font</span>
     <span class="loading loading-spinner loading-sm hidden" aria-hidden="true"
     ></span>
   </button>
@@ -56,11 +56,46 @@ const fonts = [
   let currentFontIndex = 0;
   const loadedFonts = new Set();
   const btn = document.getElementById("font-switcher-btn");
-  const fontNameSpan = btn.querySelector(".font-name");
   const spinner = btn.querySelector(".loading-spinner");
+  const fontButtonText = document.getElementById("font-button-text");
+  let revertTimeout = null;
+  let isClickMode = false;
 
   // Mark the initial font as loaded (it's already in the HTML)
   loadedFonts.add(fonts[0].url);
+
+  function showFontName(fontName, persistOnMouseLeave = false) {
+    // Clear any existing timeout
+    if (revertTimeout) {
+      clearTimeout(revertTimeout);
+    }
+
+    // Set click mode flag
+    isClickMode = persistOnMouseLeave;
+
+    // Replace button text with font name
+    fontButtonText.textContent = fontName;
+
+    // Revert to "font" after 3 seconds
+    revertTimeout = setTimeout(() => {
+      fontButtonText.textContent = "font";
+      revertTimeout = null;
+      isClickMode = false;
+    }, 3000);
+  }
+
+  function revertToFont() {
+    // Don't revert if we're in click mode (let the timeout handle it)
+    if (isClickMode) {
+      return;
+    }
+
+    if (revertTimeout) {
+      clearTimeout(revertTimeout);
+      revertTimeout = null;
+    }
+    fontButtonText.textContent = "font";
+  }
 
   function setLoading(isLoading) {
     if (isLoading) {
@@ -120,7 +155,7 @@ const fonts = [
       await new Promise((resolve) => setTimeout(resolve, 100));
 
       applyFont(nextFont.family);
-      fontNameSpan.textContent = nextFont.name;
+      showFontName(nextFont.name, true); // true = persist on mouse leave (click mode)
 
       // Store preference
       localStorage.setItem("preferred-font", currentFontIndex.toString());
@@ -140,7 +175,6 @@ const fonts = [
         currentFontIndex = index;
         const font = fonts[currentFontIndex];
         applyFont(font.family);
-        fontNameSpan.textContent = font.name;
 
         // Load the font in background if not already loaded
         if (!loadedFonts.has(font.url)) {
@@ -150,12 +184,29 @@ const fonts = [
     } else {
       // Apply default font
       applyFont(fonts[0].family);
-      fontNameSpan.textContent = fonts[0].name;
     }
   }
 
-  btn.addEventListener("click", switchFont);
+  // Show font name on hover
+  btn.addEventListener("mouseenter", () => {
+    const currentFont = fonts[currentFontIndex];
+    showFontName(currentFont.name);
+  });
+
+  // Revert to "font" when mouse leaves
+  btn.addEventListener("mouseleave", () => {
+    // If showing a font name, revert immediately
+    if (fontButtonText.textContent !== "font") {
+      revertToFont();
+    }
+  });
+
+  // Show font name on click
+  btn.addEventListener("click", () => {
+    switchFont();
+  });
 
   // Initialize on load
   init();
 </script>
+
