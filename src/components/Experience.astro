@@ -5,14 +5,15 @@ import Tick from "../assets/svgs/tick.svg";
 const allWorkExamples = await getCollection("work");
 ---
 
-<section>
-  <h2>Experience</h2>
-  <ul class="">
-    <li>
-      <p>2025</p>
-    </li>
-  </ul>
-  <div>
-    {allWorkExamples.map((item: object) => <WorkTile item={item} />)}
+<section class="my-12">
+  <h2 class="text-3xl font-bold mb-8">Experience</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {
+      allWorkExamples.map((item: object, index: number) => (
+        <div class="hover-3d" id={`work-${index}`}>
+          <WorkTile item={item} />
+        </div>
+      ))
+    }
   </div>
 </section>

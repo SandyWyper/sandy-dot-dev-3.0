@@ -1,10 +1,41 @@
 ---
+import { Image } from "astro:assets";
 const { item } = Astro.props;
 const { data } = item;
+const imageSrc = data.thumb || data.image;
 ---
 
-<div>
-  <h2>{data.title}</h2>
-  <p>{data.shortDescription.slice(0, 100)}&nbsp;...</p>
-  <a href={`/work/${item.slug}`}>Read more</a>
+<div class="card bg-base-100 shadow-xl">
+  {imageSrc && (
+    <figure>
+      <Image
+        src={imageSrc}
+        alt={data.title}
+        class="w-full h-48 object-cover"
+        widths={[300, 400, 500]}
+        sizes="(min-width: 768px) 384px, 100vw"
+      />
+    </figure>
+  )}
+  <div class="card-body">
+    <h2 class="card-title">{data.title}</h2>
+    <p>{data.shortDescription.slice(0, 150)}&nbsp;...</p>
+    {data.tags && data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mt-2">
+        {data.tags.map((tag: string) => (
+          <span class="badge badge-secondary badge-outline">{tag}</span>
+        ))}
+      </div>
+    )}
+    <div class="card-actions justify-end mt-4">
+      {data.url && (
+        <a href={data.url} target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary">
+          Visit Site
+        </a>
+      )}
+      <a href={`/work/${item.slug}`} class="btn btn-sm btn-ghost">
+        Read more
+      </a>
+    </div>
+  </div>
 </div>
