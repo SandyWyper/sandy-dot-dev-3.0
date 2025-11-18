@@ -6,14 +6,16 @@ const allWorkExamples = await getCollection("work");
 ---
 
 <section class="my-12">
-  <h2 class="text-3xl font-bold mb-8">Experience</h2>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    {
-      allWorkExamples.map((item: object, index: number) => (
-        <div class="hover-3d" id={`work-${index}`}>
-          <WorkTile item={item} />
-        </div>
-      ))
-    }
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-5xl font-bold mb-16">Work</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {
+        allWorkExamples.map((item: object, index: number) => (
+          <div class="hover-3d" id={`work-${index}`}>
+            <WorkTile item={item} />
+          </div>
+        ))
+      }
+    </div>
   </div>
 </section>

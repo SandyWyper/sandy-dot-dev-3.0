@@ -6,6 +6,10 @@
   themes: all;
 }
 
+:root {
+  font-size: 15px;
+}
+
 html {
   font-family: "Courier Prime", monospace;
 }

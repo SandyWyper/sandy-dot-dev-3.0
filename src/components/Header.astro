@@ -178,6 +178,7 @@ import FontSwitcher from "./FontSwitcher.astro";
 
   // Theme Switcher - All 35 DaisyUI themes
   const themes = [
+    "luxury",
     "light",
     "dark",
     "cupcake",
@@ -197,7 +198,6 @@ import FontSwitcher from "./FontSwitcher.astro";
     "fantasy",
     "wireframe",
     "black",
-    "luxury",
     "dracula",
     "cmyk",
     "autumn",
@@ -236,14 +236,9 @@ import FontSwitcher from "./FontSwitcher.astro";
         currentThemeIndex = themes.indexOf(savedTheme);
         applyTheme(savedTheme);
       } else {
-        // Fallback to system preference (default to "dark" or "light")
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
-        const defaultTheme = prefersDark ? "dark" : "light";
-        currentThemeIndex = themes.indexOf(defaultTheme);
-        if (currentThemeIndex === -1) currentThemeIndex = 0;
-        applyTheme(themes[currentThemeIndex]);
+        // Default to "luxury" theme
+        currentThemeIndex = 0; // luxury is first in the themes array
+        applyTheme("luxury");
       }
     }
 
@@ -273,17 +268,12 @@ import FontSwitcher from "./FontSwitcher.astro";
   // Reset Settings Function
   function resetSettings() {
     // Reset font size to default (index 0)
-    currentFontSizeIndex = 0;
-    applyFontSize(fontSizes[0]);
+    currentFontSizeIndex = 1;
+    applyFontSize(fontSizes[1]);
     localStorage.removeItem("preferred-font-size");
 
-    // Reset theme to system preference or first theme
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const defaultTheme = prefersDark ? "dark" : "light";
-    const defaultThemeIndex = themes.indexOf(defaultTheme);
-    currentThemeIndex = defaultThemeIndex !== -1 ? defaultThemeIndex : 0;
+    // Reset theme to "luxury" (default)
+    currentThemeIndex = 0; // luxury is first in the themes array
     applyTheme(themes[currentThemeIndex]);
     localStorage.removeItem("preferred-theme");
 
