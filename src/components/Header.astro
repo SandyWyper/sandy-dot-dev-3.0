@@ -71,6 +71,15 @@ import FontSwitcher from "./FontSwitcher.astro";
 
       <!-- Font Switcher -->
       <FontSwitcher />
+
+      <!-- Reset Button -->
+      <button
+        id="reset-settings-btn"
+        class="btn btn-sm btn-error btn-outline mt-2"
+        aria-label="Reset all settings to defaults"
+      >
+        Reset Settings
+      </button>
     </div>
   </div>
 </header>
@@ -261,6 +270,31 @@ import FontSwitcher from "./FontSwitcher.astro";
     localStorage.setItem("preferred-theme", newTheme);
   }
 
+  // Reset Settings Function
+  function resetSettings() {
+    // Reset font size to default (index 0)
+    currentFontSizeIndex = 0;
+    applyFontSize(fontSizes[0]);
+    localStorage.removeItem("preferred-font-size");
+
+    // Reset theme to system preference or first theme
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    const defaultTheme = prefersDark ? "dark" : "light";
+    const defaultThemeIndex = themes.indexOf(defaultTheme);
+    currentThemeIndex = defaultThemeIndex !== -1 ? defaultThemeIndex : 0;
+    applyTheme(themes[currentThemeIndex]);
+    localStorage.removeItem("preferred-theme");
+
+    // Reset font to default (index 0) - trigger font reset via custom event
+    localStorage.removeItem("preferred-font");
+    window.dispatchEvent(new CustomEvent("reset-font"));
+
+    // Update font size buttons
+    updateFontSizeButtons();
+  }
+
   // Toolbar Toggle Functionality
   function initToolbar() {
     const toggleBtn = document.getElementById("toolbar-toggle-btn");
@@ -315,6 +349,11 @@ import FontSwitcher from "./FontSwitcher.astro";
 
     if (themeBtn) {
       themeBtn.addEventListener("click", switchTheme);
+    }
+
+    const resetBtn = document.getElementById("reset-settings-btn");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", resetSettings);
     }
   });
 </script>

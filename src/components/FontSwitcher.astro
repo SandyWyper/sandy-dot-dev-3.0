@@ -164,6 +164,17 @@ const fonts = [
     switchFont();
   });
 
+  // Listen for reset event
+  window.addEventListener("reset-font", () => {
+    currentFontIndex = 0;
+    applyFont(fonts[0].family);
+    updateFontButton();
+    // Load the default font if not already loaded
+    if (!loadedFonts.has(fonts[0].url)) {
+      loadFont(fonts[0].url).catch(console.error);
+    }
+  });
+
   // Initialize on load
   init();
 </script>
