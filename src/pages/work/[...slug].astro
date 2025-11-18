@@ -19,61 +19,173 @@ interface Props {
 const { entry } = Astro.props;
 const { Content } = await entry.render();
 const { data } = entry;
+
+// Get all work examples to find next work
+const allWorkExamples = await getCollection("work");
+// Sort alphabetically by title for consistent ordering
+const sortedWork = allWorkExamples.sort((a, b) =>
+  a.data.title.localeCompare(b.data.title)
+);
+
+// Find current work index
+const currentIndex = sortedWork.findIndex((work) => work.slug === entry.slug);
+
+// Get next work (wrap to first if last)
+const nextWork =
+  currentIndex !== -1 && currentIndex < sortedWork.length - 1
+    ? sortedWork[currentIndex + 1]
+    : sortedWork[0];
 ---
 
 <Layout title={data.title} description={data.shortDescription}>
-  <section class="">
-    <div class="">
-      <div class="">
-        <div class="">
-          <Image
-            src={data.image}
-            alt={`${data.title} screenshot`}
-            class=""
-            widths={[400, 500, 600, 800, 900, 1050, 1300]}
-            sizes={`(min-width: 1024px) 50vw, 100vw`}
-          />
+  <!-- Hero Section with Browser Mockup -->
+  <div class="hero min-h-[70vh] bg-base-200">
+    <div class="hero-content w-full max-w-7xl px-4 lg:px-8 py-12 lg:py-24">
+      <div class="w-full">
+        <!-- Breadcrumbs -->
+        <div class="mb-6">
+          <div class="breadcrumbs text-sm">
+            <ul>
+              <li><a href="/">Home</a></li>
+              <li class="font-bold">{data.title}</li>
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <div
-        class="flex flex-col justify-between rounded-lg bg-background3 p-4 lg:mr-8 lg:w-1/2 lg:p-8"
-      >
-        <div class="lg:pr-8">
-          <p class="mb-4 text-sm font-light leading-none">
-            Case studies <span class="font-extrabold">/ {data.title}</span>
-          </p>
-          <p class="mb-8">{data.shortDescription}</p>
-        </div>
-        <div class="grid grid-cols-2">
-          <!-- tags -->
-          <ul class="list-disc pl-4">
+        <!-- Desktop: Side-by-side layout, Mobile: Stacked -->
+        <div
+          class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center"
+        >
+          <!-- Browser Mockup with Image -->
+          <div class="w-full order-1 lg:order-1">
+            <div
+              class="mockup-browser border border-base-300 bg-base-100 shadow-lg"
+            >
+              <div class="mockup-browser-toolbar">
+                <div class="input border border-base-300 w-full max-w-xs">
+                  {
+                    data.url ? (
+                      <a
+                        href={data.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="text-sm text-base-content/70 hover:text-primary"
+                      >
+                        {data.url}
+                      </a>
+                    ) : (
+                      <span class="text-sm text-base-content/50">
+                        {data.title}
+                      </span>
+                    )
+                  }
+                </div>
+              </div>
+              <div class="bg-base-200 p-0">
+                <Image
+                  src={data.image}
+                  alt={`${data.title} screenshot`}
+                  class="w-full h-auto object-cover"
+                  widths={[800, 1000, 1200, 1400, 1600]}
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Work Info -->
+          <div class="order-2 lg:order-2 flex flex-col justify-center">
+            <!-- Title -->
+            <h1 class="text-2xl lg:text-4xl font-bold mb-4">{data.title}</h1>
+
+            <!-- Description -->
             {
-              data.tags &&
-                data.tags.map((tag: string) => (
-                  <li class="mb-2 mr-2 whitespace-nowrap rounded-sm text-sm font-medium leading-none">
-                    {tag}
-                  </li>
-                ))
+              data.shortDescription && (
+                <p class="text-lg lg:text-xl text-base-content/80 mb-6">
+                  {data.shortDescription}
+                </p>
+              )
             }
-          </ul>
 
-          {
-            data.url && (
-              <a
-                href={data.url}
-                target="_blank"
-                class="btn btn-primary h-max w-max self-end justify-self-end"
-              >
-                Live
-              </a>
-            )
-          }
+            <!-- Tags -->
+            {
+              data.tags && data.tags.length > 0 && (
+                <div class="flex flex-wrap gap-2 mb-8">
+                  {data.tags.map((tag: string) => (
+                    <span class="badge badge-primary badge-lg">{tag}</span>
+                  ))}
+                </div>
+              )
+            }
+
+            <!-- Action Button -->
+            {
+              data.url && (
+                <div class="flex flex-wrap gap-4">
+                  <a
+                    href={data.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="btn btn-primary btn-lg"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="w-5 h-5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                      />
+                    </svg>
+                    Live Site
+                  </a>
+                </div>
+              )
+            }
+          </div>
         </div>
       </div>
     </div>
-    <div class="markdown mx-auto pt-8">
+  </div>
+
+  <!-- <div class="divider max-w-7xl mx-auto px-4 lg:px-8"></div> -->
+
+  <!-- Content Section -->
+  <article class="max-w-4xl mx-auto px-4 lg:px-8 py-12 lg:py-24">
+    <div class="space-y-6 text-base-content/90 prose min-w-full">
       <Content />
+    </div>
+  </article>
+
+  <!-- Next Work Section -->
+  <section class="max-w-4xl mx-auto px-4 lg:px-8 py-12 lg:py-24">
+    <!-- <div class="divider mb-8"></div> -->
+    <div class="flex flex-col items-center text-center">
+      <p class="text-sm text-base-content/70 mb-4">Next Work</p>
+      <a
+        href={`/work/${nextWork.slug}`}
+        class="btn btn-primary btn-lg btn-wide"
+      >
+        <span>{nextWork.data.title}</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-5 h-5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 4.5 21 12m0 0-8.5 7.5M21 12H3"></path>
+        </svg>
+      </a>
     </div>
   </section>
 </Layout>
