@@ -1,19 +1,16 @@
 ---
 import { getCollection } from "astro:content";
 import WorkTile from "./WorkTile.astro";
-import Tick from "../assets/svgs/tick.svg";
 const allWorkExamples = await getCollection("work");
 ---
 
 <section class="my-12">
-  <div class="max-w-7xl mx-auto">
+  <div class="max-w-7xl mx-auto px-4 lg:px-8">
     <h2 class="text-5xl font-bold mb-16">Work</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
       {
         allWorkExamples.map((item: object, index: number) => (
-          <div class="hover-3d" id={`work-${index}`}>
-            <WorkTile item={item} />
-          </div>
+          <WorkTile item={item} />
         ))
       }
     </div>
