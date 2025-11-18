@@ -2,6 +2,7 @@
 # posttype: "projects"
 date: "2020-02-01"
 title: "Banner Time"
+order: 3
 description: "I created a JQuery plugin that injects sale or announcement banners for a scheduled time. Simply include the JavaScript file below your JQuery script tag, and the 'Banner' object will be available to initiate."
 category: "Side Project"
 cover: "./banner-time.jpg"

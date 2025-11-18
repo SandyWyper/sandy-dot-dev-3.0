@@ -3,6 +3,18 @@ import { getCollection } from "astro:content";
 import ProjectTile from "./ProjectTile.astro";
 
 const allProjects = await getCollection("projects");
+// Sort by order field (lower numbers first), then by date if no order specified
+const sortedProjects = allProjects.sort((a, b) => {
+  const orderA = a.data.order ?? Infinity;
+  const orderB = b.data.order ?? Infinity;
+  if (orderA !== orderB) {
+    return orderA - orderB;
+  }
+  // If order is the same or both undefined, sort by date (most recent first)
+  const dateA = a.data.date ? new Date(a.data.date).getTime() : 0;
+  const dateB = b.data.date ? new Date(b.data.date).getTime() : 0;
+  return dateB - dateA;
+});
 ---
 
 <section class="my-12 lg:my-24">
@@ -10,7 +22,7 @@ const allProjects = await getCollection("projects");
     <h2 class="text-5xl font-bold mb-16">Projects</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {
-        allProjects.map((item: object, index: number) => (
+        sortedProjects.map((item: object, index: number) => (
           <ProjectTile item={item} />
         ))
       }

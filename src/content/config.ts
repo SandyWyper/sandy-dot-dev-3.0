@@ -13,6 +13,7 @@ const projects = defineCollection({
       tags: z.array(z.string()).optional(),
       repository: z.string().url().optional(),
       live: z.string().url().optional(),
+      order: z.number().optional(),
     }),
 });
 

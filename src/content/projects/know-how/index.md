@@ -2,6 +2,7 @@
 # posttype: "projects"
 date: "2024-01-15"
 title: "Know-How"
+order: 1
 description: "A skill-sharing platform built with Django that connects people who want to learn with those who want to teach. Users can create profiles, offer their skills through listings, and leave reviews for each other."
 category: "Capstone Project"
 cover: "./homepage-desktop-screenshot.png"
