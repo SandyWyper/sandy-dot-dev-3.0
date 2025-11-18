@@ -13,6 +13,9 @@
 html {
   font-family: "Courier Prime", monospace;
 }
+.btn {
+  text-transform: uppercase;
+}
 
 /* Links use accent color */
 a:not(.btn) {
