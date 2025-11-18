@@ -238,7 +238,7 @@ import FontSwitcher from "./FontSwitcher.astro";
   function getCurrentTheme() {
     // Get the current theme from the DOM (set by inline script or previous selection)
     const currentTheme = document.documentElement.getAttribute("data-theme");
-    return currentTheme || themes[0]; // Default to first theme if not set
+    return currentTheme || "sunset"; // Default to sunset theme if not set
   }
 
   function initTheme() {
@@ -255,9 +255,9 @@ import FontSwitcher from "./FontSwitcher.astro";
         currentThemeIndex = themes.indexOf(savedTheme);
         applyTheme(savedTheme);
       } else {
-        // Default to "luxury" theme
-        currentThemeIndex = 0; // luxury is first in the themes array
-        applyTheme("luxury");
+        // Default to "sunset" theme
+        currentThemeIndex = themes.indexOf("sunset");
+        applyTheme("sunset");
       }
     }
 
@@ -291,9 +291,9 @@ import FontSwitcher from "./FontSwitcher.astro";
     applyFontSize(fontSizes[1]);
     localStorage.removeItem("preferred-font-size");
 
-    // Reset theme to "luxury" (default)
-    currentThemeIndex = 0; // luxury is first in the themes array
-    applyTheme(themes[currentThemeIndex]);
+    // Reset theme to "sunset" (default)
+    currentThemeIndex = themes.indexOf("sunset");
+    applyTheme("sunset");
     localStorage.removeItem("preferred-theme");
 
     // Reset font to default (index 0) - trigger font reset via custom event
