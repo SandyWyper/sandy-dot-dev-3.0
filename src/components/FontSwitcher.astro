@@ -40,31 +40,47 @@ const fonts = [
 ];
 ---
 
-<span class="text-sm">font: </span>
-<button
-  id="font-switcher-btn"
-  class="btn btn-sm btn-outline"
-  aria-label="Switch font"
->
-  <span id="font-button-text" class="text-sm"></span>
-  <span class="loading loading-spinner loading-sm hidden" aria-hidden="true"
-  ></span>
-</button>
+<div class="flex items-center gap-2 w-full">
+  <span class="text-sm">font: </span>
+  <span id="font-display-text" class="text-sm font-medium"></span>
+  <button
+    id="font-switcher-btn"
+    class="btn btn-sm btn-outline btn-square h-7 w-7 relative ml-auto"
+    aria-label="Switch font"
+  >
+    <span
+      class="loading loading-spinner loading-xs hidden absolute"
+      aria-hidden="true"></span>
+    <svg
+      class="w-4 h-4"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+    </svg>
+  </button>
+</div>
 
 <script define:vars={{ fonts }}>
   let currentFontIndex = 0;
   const loadedFonts = new Set();
   const btn = document.getElementById("font-switcher-btn");
   const spinner = btn.querySelector(".loading-spinner");
-  const fontButtonText = document.getElementById("font-button-text");
+  const fontDisplayText = document.getElementById("font-display-text");
 
   // Mark the initial font as loaded (it's already in the HTML)
   loadedFonts.add(fonts[0].url);
 
   function updateFontButton() {
     const currentFont = fonts[currentFontIndex];
-    if (fontButtonText) {
-      fontButtonText.textContent = currentFont.name;
+    if (fontDisplayText) {
+      fontDisplayText.textContent = currentFont.name;
     }
   }
 
@@ -73,12 +89,16 @@ const fonts = [
       btn.disabled = true;
       btn.classList.add("btn-disabled");
       spinner.classList.remove("hidden");
-      spinner.classList.add("inline-block");
+      // Hide the icon when loading
+      const icon = btn.querySelector("svg");
+      if (icon) icon.style.display = "none";
     } else {
       btn.disabled = false;
       btn.classList.remove("btn-disabled");
       spinner.classList.add("hidden");
-      spinner.classList.remove("inline-block");
+      // Show the icon when not loading
+      const icon = btn.querySelector("svg");
+      if (icon) icon.style.display = "block";
     }
   }
 

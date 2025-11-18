@@ -60,14 +60,29 @@ import FontSwitcher from "./FontSwitcher.astro";
       </div>
 
       <!-- Theme Switcher -->
-      <span class="text-sm">theme: </span>
-      <button
-        id="theme-switcher-btn"
-        class="btn btn-sm btn-outline"
-        aria-label="Switch theme"
-      >
-        <span id="theme-button-text" class="text-sm"></span>
-      </button>
+      <div class="flex items-center gap-2 w-full">
+        <span class="text-sm">theme: </span>
+        <span id="theme-display-text" class="text-sm font-medium"></span>
+        <button
+          id="theme-switcher-btn"
+          class="btn btn-sm btn-outline btn-square ml-auto h-7 w-7"
+          aria-label="Switch theme"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+          </svg>
+        </button>
+      </div>
 
       <!-- Font Switcher -->
       <FontSwitcher />
@@ -75,7 +90,7 @@ import FontSwitcher from "./FontSwitcher.astro";
       <!-- Reset Button -->
       <button
         id="reset-settings-btn"
-        class="btn btn-sm btn-error btn-outline mt-2"
+        class="btn btn-tertiary mt-2"
         aria-label="Reset all settings to defaults"
       >
         Reset Settings
@@ -89,7 +104,7 @@ import FontSwitcher from "./FontSwitcher.astro";
   const fontSizes = [12, 14, 16, 18, 20];
   let currentFontSizeIndex = 0;
 
-  function findClosestFontSizeIndex(currentSize) {
+  function findClosestFontSizeIndex(currentSize: number) {
     // Find the closest font size in the array
     let closestIndex = 0;
     let minDiff = Math.abs(fontSizes[0] - currentSize);
@@ -129,14 +144,18 @@ import FontSwitcher from "./FontSwitcher.astro";
     }
   }
 
-  function applyFontSize(size) {
+  function applyFontSize(size: number) {
     document.documentElement.style.fontSize = `${size}px`;
     updateFontSizeButtons();
   }
 
   function updateFontSizeButtons() {
-    const decreaseBtn = document.getElementById("font-size-decrease-btn");
-    const increaseBtn = document.getElementById("font-size-increase-btn");
+    const decreaseBtn = document.getElementById(
+      "font-size-decrease-btn"
+    ) as HTMLButtonElement | null;
+    const increaseBtn = document.getElementById(
+      "font-size-increase-btn"
+    ) as HTMLButtonElement | null;
 
     if (decreaseBtn) {
       decreaseBtn.disabled = currentFontSizeIndex === 0;
@@ -246,13 +265,13 @@ import FontSwitcher from "./FontSwitcher.astro";
     updateThemeButton();
   }
 
-  function applyTheme(theme) {
+  function applyTheme(theme: string) {
     document.documentElement.setAttribute("data-theme", theme);
     updateThemeButton();
   }
 
   function updateThemeButton() {
-    const text = document.getElementById("theme-button-text");
+    const text = document.getElementById("theme-display-text");
     if (text) {
       text.textContent = themes[currentThemeIndex];
     }
