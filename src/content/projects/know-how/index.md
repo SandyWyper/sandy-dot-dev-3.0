@@ -16,6 +16,7 @@ tags:
   - "Heroku"
   - "Cloudinary"
 repository: "https://github.com/SandyWyper/Know-How"
+live: "https://know-how-ac9183a9af5a.herokuapp.com/"
 ---
 
 > A skill-sharing platform that connects learners with teachers, built with Python, Django, and PostgreSQL.
