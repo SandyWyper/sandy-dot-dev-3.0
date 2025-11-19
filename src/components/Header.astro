@@ -6,12 +6,12 @@ import FontSwitcher from "./FontSwitcher.astro";
   <!-- Settings Button -->
   <button
     id="toolbar-toggle-btn"
-    class="settings-btn border border-primary bg-base-100 p-2 rounded-lg transition-all cursor-pointer"
+    class="settings-btn p-4 rounded-lg transition-all cursor-pointer"
     aria-label="Toggle toolbar"
     aria-expanded="false"
   >
     <svg
-      class="settings-icon w-6 h-6 text-accent"
+      class="settings-icon w-8 h-8 text-accent"
       fill="none"
       stroke="currentColor"
       stroke-width="2"
@@ -33,7 +33,7 @@ import FontSwitcher from "./FontSwitcher.astro";
   <!-- Toolbar Content -->
   <div
     id="toolbar-content"
-    class="toolbar-content bg-base-300/80 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-tertiary hidden"
+    class="toolbar-content bg-base-300/80 backdrop-blur-sm rounded-lg p-6 shadow-lg border border-tertiary hidden"
   >
     <div class="flex flex-col items-start gap-2">
       <!-- Font Size Switcher -->
@@ -384,9 +384,9 @@ import FontSwitcher from "./FontSwitcher.astro";
   /* Toolbar positioning - always expands below (vertical) on both mobile and desktop */
   .toolbar-content {
     position: absolute;
-    top: 100%;
-    right: 0;
+    top: 3rem;
+    right: 2rem;
     margin-top: 0.5rem;
-    min-width: 200px;
+    min-width: max-content;
   }
 </style>
