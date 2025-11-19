@@ -9,6 +9,13 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  integrations: [mdx(), serviceWorker()],
+  integrations: [
+    mdx(),
+    serviceWorker({
+      workbox: {
+        swDest: "sw.js", // <- rename here
+      },
+    }),
+  ],
   output: "static",
 });
