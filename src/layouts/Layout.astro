@@ -26,19 +26,7 @@ const pageTitle = title ? `${title} | SandyDotDev` : "SandyDotDev";
       href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&display=swap"
       rel="stylesheet"
     />
-    <script is:inline>
-      if (
-        navigator &&
-        navigator.serviceWorker &&
-        navigator.serviceWorker.getRegistrations
-      ) {
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-          for (let registration of registrations) {
-            registration.unregister();
-          }
-        });
-      }
-    </script>
+
     <script is:inline>
       // Initialize theme immediately to prevent flash
       (function () {
