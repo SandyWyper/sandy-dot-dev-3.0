@@ -14,6 +14,8 @@ export default defineConfig({
     serviceWorker({
       workbox: {
         swDest: "dist/sw.js", // <- rename here
+        skipWaiting: true,
+        clientsClaim: true,
       },
     }),
   ],
