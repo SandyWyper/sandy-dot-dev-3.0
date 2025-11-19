@@ -1,5 +1,6 @@
 ---
 import FontSwitcher from "./FontSwitcher.astro";
+import { themes, DEFAULT_THEME } from "../utils/themes";
 ---
 
 <header class="top-0 right-0 fixed z-50">
@@ -99,7 +100,7 @@ import FontSwitcher from "./FontSwitcher.astro";
   </div>
 </header>
 
-<script>
+<script define:vars={{ themes, defaultTheme: DEFAULT_THEME }}>
   // Font Size Switcher
   const fontSizes = [12, 14, 16, 18, 20];
   let currentFontSizeIndex = 0;
@@ -195,50 +196,13 @@ import FontSwitcher from "./FontSwitcher.astro";
     }
   }
 
-  // Theme Switcher - All 35 DaisyUI themes
-  const themes = [
-    "luxury",
-    "light",
-    "dark",
-    "cupcake",
-    "bumblebee",
-    "emerald",
-    "corporate",
-    "synthwave",
-    "retro",
-    "cyberpunk",
-    "valentine",
-    "halloween",
-    "garden",
-    "forest",
-    "aqua",
-    "lofi",
-    "pastel",
-    "fantasy",
-    "wireframe",
-    "black",
-    "dracula",
-    "cmyk",
-    "autumn",
-    "business",
-    "acid",
-    "lemonade",
-    "night",
-    "coffee",
-    "winter",
-    "dim",
-    "nord",
-    "sunset",
-    "caramellatte",
-    "abyss",
-    "silk",
-  ];
+  // Theme Switcher - All DaisyUI themes (imported from shared constants)
   let currentThemeIndex = 0;
 
   function getCurrentTheme() {
     // Get the current theme from the DOM (set by inline script or previous selection)
     const currentTheme = document.documentElement.getAttribute("data-theme");
-    return currentTheme || "sunset"; // Default to sunset theme if not set
+    return currentTheme || defaultTheme; // Default theme if not set
   }
 
   function initTheme() {
@@ -255,9 +219,9 @@ import FontSwitcher from "./FontSwitcher.astro";
         currentThemeIndex = themes.indexOf(savedTheme);
         applyTheme(savedTheme);
       } else {
-        // Default to "sunset" theme
-        currentThemeIndex = themes.indexOf("sunset");
-        applyTheme("sunset");
+        // Default to default theme
+        currentThemeIndex = themes.indexOf(defaultTheme);
+        applyTheme(defaultTheme);
       }
     }
 
@@ -291,9 +255,9 @@ import FontSwitcher from "./FontSwitcher.astro";
     applyFontSize(fontSizes[1]);
     localStorage.removeItem("preferred-font-size");
 
-    // Reset theme to "sunset" (default)
-    currentThemeIndex = themes.indexOf("sunset");
-    applyTheme("sunset");
+    // Reset theme to default
+    currentThemeIndex = themes.indexOf(defaultTheme);
+    applyTheme(defaultTheme);
     localStorage.removeItem("preferred-theme");
 
     // Reset font to default (index 0) - trigger font reset via custom event
