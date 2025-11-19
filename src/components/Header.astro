@@ -2,7 +2,7 @@
 import FontSwitcher from "./FontSwitcher.astro";
 ---
 
-<header class="top-0 right-0 fixed z-50">
+<header class="top-0 right-0 fixed z-50 p-6">
   <!-- Settings Button -->
   <button
     id="toolbar-toggle-btn"
@@ -313,6 +313,15 @@ import FontSwitcher from "./FontSwitcher.astro";
 
     let isExpanded = false;
 
+    function closeToolbar() {
+      if (isExpanded) {
+        isExpanded = false;
+        toolbarContent?.classList.add("hidden");
+        toggleBtn?.setAttribute("aria-expanded", "false");
+        settingsIcon?.classList.remove("is-active");
+      }
+    }
+
     function toggleToolbar() {
       isExpanded = !isExpanded;
 
@@ -331,6 +340,20 @@ import FontSwitcher from "./FontSwitcher.astro";
     }
 
     toggleBtn.addEventListener("click", toggleToolbar);
+
+    // Close toolbar when clicking outside
+    document.addEventListener("click", (event) => {
+      const target = event.target as Node;
+
+      // Check if click is outside both the toolbar content and toggle button
+      if (
+        isExpanded &&
+        !toolbarContent.contains(target) &&
+        !toggleBtn.contains(target)
+      ) {
+        closeToolbar();
+      }
+    });
   }
 
   // Initialize font size and attach event listeners after DOM is ready
@@ -383,7 +406,7 @@ import FontSwitcher from "./FontSwitcher.astro";
   /* Toolbar positioning - always expands below (vertical) on both mobile and desktop */
   .toolbar-content {
     position: absolute;
-    top: 3rem;
+    top: 3.5rem;
     right: 2rem;
     margin-top: 0.5rem;
     min-width: max-content;
