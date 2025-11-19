@@ -13,7 +13,7 @@ export default defineConfig({
     mdx(),
     serviceWorker({
       workbox: {
-        swDest: "sw.js", // <- rename here
+        swDest: "dist/sw.js", // <- rename here
       },
     }),
   ],
