@@ -105,7 +105,7 @@ import { themes, DEFAULT_THEME } from "../utils/themes";
   const fontSizes = [12, 14, 16, 18, 20];
   let currentFontSizeIndex = 0;
 
-  function findClosestFontSizeIndex(currentSize: number) {
+  function findClosestFontSizeIndex(currentSize) {
     // Find the closest font size in the array
     let closestIndex = 0;
     let minDiff = Math.abs(fontSizes[0] - currentSize);
@@ -145,18 +145,14 @@ import { themes, DEFAULT_THEME } from "../utils/themes";
     }
   }
 
-  function applyFontSize(size: number) {
+  function applyFontSize(size) {
     document.documentElement.style.fontSize = `${size}px`;
     updateFontSizeButtons();
   }
 
   function updateFontSizeButtons() {
-    const decreaseBtn = document.getElementById(
-      "font-size-decrease-btn"
-    ) as HTMLButtonElement | null;
-    const increaseBtn = document.getElementById(
-      "font-size-increase-btn"
-    ) as HTMLButtonElement | null;
+    const decreaseBtn = document.getElementById("font-size-decrease-btn");
+    const increaseBtn = document.getElementById("font-size-increase-btn");
 
     if (decreaseBtn) {
       decreaseBtn.disabled = currentFontSizeIndex === 0;
@@ -229,7 +225,7 @@ import { themes, DEFAULT_THEME } from "../utils/themes";
     updateThemeButton();
   }
 
-  function applyTheme(theme: string) {
+  function applyTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
     updateThemeButton();
   }
@@ -308,7 +304,7 @@ import { themes, DEFAULT_THEME } from "../utils/themes";
 
     // Close toolbar when clicking outside
     document.addEventListener("click", (event) => {
-      const target = event.target as Node;
+      const target = event.target;
 
       // Check if click is outside both the toolbar content and toggle button
       if (
