@@ -40,12 +40,13 @@ const fonts = [
 ];
 ---
 
-<div class="flex items-center gap-2 w-full">
+<div class="flex items-center gap-2 w-full lg:w-auto px-6 py-3 toolbar-item">
   <span class="text-sm">font: </span>
-  <span id="font-display-text" class="text-sm font-medium"></span>
+  <span id="font-display-text" class="text-sm font-medium whitespace-nowrap"
+  ></span>
   <button
     id="font-switcher-btn"
-    class="btn btn-sm btn-outline btn-square h-7 w-7 relative ml-auto"
+    class="btn btn-sm btn-outline btn-square h-7 w-7 relative ml-auto lg:ml-2"
     aria-label="Switch font"
   >
     <span
