@@ -37,15 +37,17 @@ import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
 <!-- NASA Modal -->
 <dialog id="nasa_modal" class="modal">
-  <div class="modal-box max-w-4xl">
+  <div class="modal-box max-w-4xl max-h-[85vh] lg:max-h-[90vh] overflow-y-auto">
     <!-- Modal Header with NASA Logo and Title -->
-    <div class="flex items-center gap-4 mb-6 pb-4 border-b border-base-300">
+    <div
+      class="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-base-300"
+    >
+      <h2 class="text-3xl font-bold text-primary">NASA Photo of the Day</h2>
       <img
         src={nasaLogo.src}
         alt="NASA Logo"
         class="w-16 h-16 object-contain"
       />
-      <h2 class="text-3xl font-bold text-primary">NASA Photo of the Day</h2>
     </div>
 
     <div id="nasa-modal-loading" class="flex justify-center items-center py-12">
