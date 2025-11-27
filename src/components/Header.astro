@@ -1,9 +1,13 @@
 ---
 import FontSwitcher from "./FontSwitcher.astro";
+import NasaModal from "./NasaModal.astro";
 import { themes, DEFAULT_THEME } from "../utils/themes";
 ---
 
-<header class="top-0 right-0 fixed z-50">
+<header class="top-0 right-0 fixed z-50 flex gap-0">
+  <!-- NASA Modal Button -->
+  <NasaModal />
+
   <!-- Settings Button -->
   <button
     id="toolbar-toggle-btn"

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.4",
+    "@fancyapps/ui": "^6.1.6",
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.2",
     "astrojs-service-worker": "^2.0.0",
