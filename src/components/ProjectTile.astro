@@ -6,7 +6,7 @@ const imageSrc = data.cover;
 ---
 
 <div
-  class="card bg-base-100 shadow-sm hover:shadow-lg transition-shadow duration-300 border-primary border"
+  class="card bg-base-100 shadow-sm hover:shadow-lg transition-shadow duration-300 border-primary"
 >
   <figure class="w-full h-64 p-3">
     {
@@ -14,7 +14,7 @@ const imageSrc = data.cover;
         <Image
           src={imageSrc}
           alt={data.coverAlt || data.title}
-          class="object-cover h-full w-full rounded-lg"
+          class="object-cover h-full w-full rounded-lg rounded-b-none"
         />
       ) : (
         <div class="w-full h-full bg-gray-200" />
@@ -24,7 +24,7 @@ const imageSrc = data.cover;
 
   <div class="card-body justify-between">
     <div>
-      <h2 class="card-title">{data.title}</h2>
+      <h3 class="card-title">{data.title}</h3>
       <p>{(data.description || "").slice(0, 150)}&nbsp;...</p>
       {
         data.tags && data.tags.length > 0 && (
@@ -40,7 +40,7 @@ const imageSrc = data.cover;
       }
     </div>
     <div class="card-actions justify-end">
-      <a class="btn btn-accent" href={`/projects/${item.slug}`}> Read more </a>
+      <a class="btn btn-accent" href={`/projects/${item.slug}`}>Read more</a>
     </div>
   </div>
 </div>
