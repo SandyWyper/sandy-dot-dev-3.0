@@ -165,7 +165,3 @@ This booking system was a great exercise in building something useful without ov
 The hackathon format forced me to focus on what mattered: a working booking system that could be integrated quickly. Sometimes the best solutions are the simplest ones.
 
 If you're interested in using or contributing to the project, check out the [GitHub repository](https://github.com/SandyWyper/White-Label-Booking-System). The code is open source and ready to be customised for your needs.
-
----
-
-**White Label Booking System** - _Demo ready. Production optional._
