@@ -92,6 +92,13 @@ import { Image } from "astro:assets";
    * - Optional debug mode showing cursor position and grid coordinates
    * - Memory leak prevention with proper cleanup
    * - Error handling for sprite loading failures
+   * - Astro view transitions support (re-initializes on navigation)
+   *
+   * Lifecycle & Navigation:
+   * - Listens to both DOMContentLoaded (initial load) and astro:page-load (view transitions)
+   * - Properly cleans up event listeners and DOM elements before re-initializing
+   * - Uses requestAnimationFrame to ensure DOM is ready after view transition swaps
+   * - Handles cleanup on page unload to prevent memory leaks
    *
    * How it works:
    * 1. Loads a low-res placeholder image first for instant visibility
@@ -100,6 +107,7 @@ import { Image } from "astro:assets";
    * 4. Maps coordinates to grid indices [0, 10]
    * 5. Updates background-position to show the correct sprite frame
    * 6. Fades out placeholder once sprite is loaded
+   * 7. On navigation, cleans up and re-initializes to work with Astro view transitions
    */
 
   // Sprite grid configuration
@@ -243,6 +251,11 @@ import { Image } from "astro:assets";
     (container as any).__faceTrackerCleanup = cleanup;
   }
 
+  /**
+   * Initialize or re-initialize all face trackers on the page.
+   * Called on initial page load and after each Astro view transition navigation.
+   * Ensures proper cleanup before re-initializing to prevent duplicate event listeners.
+   */
   function initFaceTrackers() {
     // Clean up any existing trackers first to prevent duplicates
     document.querySelectorAll<HTMLElement>(".face-tracker").forEach((el) => {
@@ -270,18 +283,21 @@ import { Image } from "astro:assets";
   }
 
   // Handle initial page load
+  // DOMContentLoaded fires only on the first page load
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initFaceTrackers);
   } else {
-    // DOM already loaded, initialize immediately
+    // DOM already loaded (e.g., script loaded after DOM ready), initialize immediately
     initFaceTrackers();
   }
 
   // Handle Astro view transitions navigation
-  // This fires on every navigation when view transitions are enabled
+  // astro:page-load fires on every navigation when view transitions are enabled
+  // This ensures the face tracker re-initializes when navigating back to pages containing it
   document.addEventListener("astro:page-load", initFaceTrackers);
 
-  // Optional: Add cleanup on page unload for SPA-like behavior
+  // Cleanup on page unload to prevent memory leaks
+  // This is especially important for SPA-like behavior with view transitions
   if (typeof window !== "undefined") {
     window.addEventListener("beforeunload", () => {
       document.querySelectorAll<HTMLElement>(".face-tracker").forEach((el) => {
