@@ -1,6 +1,7 @@
 ---
 import placeholderImg from "../assets/images/sandy-face-placeholder.webp";
 import spriteImg from "../assets/images/sandy-face-grid.webp";
+import { Image } from "astro:assets";
 ---
 
 <style is:global>
@@ -15,17 +16,29 @@ import spriteImg from "../assets/images/sandy-face-grid.webp";
   }
 
   .face-sprite {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     background-size: 1100% 1100%; /* 11 columns × 11 rows */
     background-repeat: no-repeat;
     image-rendering: -webkit-optimize-contrast;
     image-rendering: crisp-edges;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
   }
 
-  .face-sprite.loading {
-    background-size: cover;
-    background-position: center;
+  .face-sprite.loaded {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .face-tracker img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   .face-debug {
@@ -57,9 +70,16 @@ import spriteImg from "../assets/images/sandy-face-grid.webp";
   class="face-tracker shadow-lg mx-auto my-12"
   id="face"
   data-debug="false"
-  data-placeholder-src={placeholderImg.src}
   data-sprite-src={spriteImg.src}
 >
+  <Image
+    src={placeholderImg}
+    alt="Sandy's face"
+    width={300}
+    height={300}
+    id="placeholder-image"
+    loading="eager"
+  />
 </div>
 <script>
   // Sprite grid configuration
@@ -91,17 +111,19 @@ import spriteImg from "../assets/images/sandy-face-grid.webp";
 
   function initializeFaceTracker(container: HTMLElement): void {
     const showDebug = String(container.dataset.debug || "false") === "true";
-    const placeholderSrc = container.dataset.placeholderSrc || "";
     const spriteSrc = container.dataset.spriteSrc || "";
 
-    // Create sprite div with placeholder background
+    // Get the placeholder image element
+    const placeholderImg =
+      container.querySelector<HTMLImageElement>("#placeholder-image");
+    if (!placeholderImg) {
+      console.error("Placeholder image not found");
+      return;
+    }
+
+    // Create sprite div
     const spriteDiv = document.createElement("div");
-    spriteDiv.className = "face-sprite loading loading-ring loading-lg";
-    spriteDiv.style.backgroundImage = `url("${placeholderSrc}")`;
-    spriteDiv.style.width = "100%";
-    spriteDiv.style.height = "100%";
-    spriteDiv.style.backgroundSize = "cover";
-    spriteDiv.style.backgroundPosition = "center";
+    spriteDiv.className = "face-sprite";
     spriteDiv.setAttribute("role", "img");
     spriteDiv.setAttribute("aria-label", "Sandy's face following your cursor");
     container.appendChild(spriteDiv);
@@ -120,10 +142,20 @@ import spriteImg from "../assets/images/sandy-face-grid.webp";
     spriteImage.onload = () => {
       spriteLoaded = true;
       spriteDiv.style.backgroundImage = `url("${spriteSrc}")`;
-      spriteDiv.style.backgroundSize = "1100% 1100%"; // 11x11 grid
       spriteDiv.style.backgroundPosition = "50% 50%"; // Start centered
-      spriteDiv.classList.remove("loading");
-      spriteDiv.classList.remove("loading-ring");
+
+      // Listen for transition end to remove placeholder
+      const handleTransitionEnd = (e: TransitionEvent) => {
+        if (e.propertyName === "opacity" && e.target === spriteDiv) {
+          if (placeholderImg.parentNode) {
+            placeholderImg.remove();
+          }
+          spriteDiv.removeEventListener("transitionend", handleTransitionEnd);
+        }
+      };
+      spriteDiv.addEventListener("transitionend", handleTransitionEnd);
+
+      spriteDiv.classList.add("loaded");
 
       // Trigger initial position update
       const rect = container.getBoundingClientRect();
