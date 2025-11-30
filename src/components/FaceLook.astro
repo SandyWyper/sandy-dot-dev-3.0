@@ -243,11 +243,43 @@ import { Image } from "astro:assets";
     (container as any).__faceTrackerCleanup = cleanup;
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    document
-      .querySelectorAll<HTMLElement>(".face-tracker")
-      .forEach((el) => initializeFaceTracker(el));
-  });
+  function initFaceTrackers() {
+    // Clean up any existing trackers first to prevent duplicates
+    document.querySelectorAll<HTMLElement>(".face-tracker").forEach((el) => {
+      // Remove event listeners
+      const cleanup = (el as any).__faceTrackerCleanup;
+      if (cleanup) {
+        cleanup();
+        delete (el as any).__faceTrackerCleanup;
+      }
+      // Remove any existing sprite divs that might have been added
+      const existingSprite = el.querySelector(".face-sprite");
+      if (existingSprite) existingSprite.remove();
+      const existingDebug = el.querySelector(".face-debug");
+      if (existingDebug) existingDebug.remove();
+    });
+
+    // Small delay to ensure DOM is fully ready after view transition swap
+    // This is especially important for astro:page-load events
+    requestAnimationFrame(() => {
+      // Initialize all face trackers
+      document
+        .querySelectorAll<HTMLElement>(".face-tracker")
+        .forEach((el) => initializeFaceTracker(el));
+    });
+  }
+
+  // Handle initial page load
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFaceTrackers);
+  } else {
+    // DOM already loaded, initialize immediately
+    initFaceTrackers();
+  }
+
+  // Handle Astro view transitions navigation
+  // This fires on every navigation when view transitions are enabled
+  document.addEventListener("astro:page-load", initFaceTrackers);
 
   // Optional: Add cleanup on page unload for SPA-like behavior
   if (typeof window !== "undefined") {
