@@ -79,10 +79,31 @@ import { Image } from "astro:assets";
   />
 </div>
 <script>
+  /**
+   * Face Tracker Component
+   *
+   * Creates an interactive face sprite that follows the user's cursor across the page.
+   * Uses an 11x11 sprite sheet grid where each frame shows the face looking in a different direction.
+   *
+   * Features:
+   * - Smooth cursor tracking with immediate response
+   * - Progressive image loading (placeholder → sprite sheet)
+   * - Touch and mouse support
+   * - Optional debug mode showing cursor position and grid coordinates
+   * - Memory leak prevention with proper cleanup
+   * - Error handling for sprite loading failures
+   *
+   * How it works:
+   * 1. Loads a low-res placeholder image first for instant visibility
+   * 2. Preloads the sprite sheet in the background
+   * 3. Converts cursor position to normalized coordinates [-1, 1]
+   * 4. Maps coordinates to grid indices [0, 10]
+   * 5. Updates background-position to show the correct sprite frame
+   * 6. Fades out placeholder once sprite is loaded
+   */
+
   // Sprite grid configuration
   const GRID_SIZE = 11; // 11x11 grid
-  const GRID_COLS = 11;
-  const GRID_ROWS = 11;
 
   function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
@@ -107,12 +128,16 @@ import { Image } from "astro:assets";
   }
 
   function initializeFaceTracker(container: HTMLElement): void {
-    const showDebug = String(container.dataset.debug || "false") === "true";
+    const showDebug = container.dataset.debug === "true";
     const spriteSrc = container.dataset.spriteSrc || "";
 
+    if (!spriteSrc) {
+      console.error("Sprite source not provided");
+      return;
+    }
+
     // Get the placeholder image element
-    const placeholderImg =
-      container.querySelector<HTMLImageElement>("#placeholder-image");
+    const placeholderImg = container.querySelector<HTMLImageElement>("img");
     if (!placeholderImg) {
       console.error("Placeholder image not found");
       return;
@@ -136,6 +161,13 @@ import { Image } from "astro:assets";
 
     // Preload sprite sheet
     const spriteImage = new Image();
+
+    spriteImage.onerror = () => {
+      console.error("Failed to load sprite image:", spriteSrc);
+      spriteDiv.remove();
+      if (debugEl) debugEl.remove();
+    };
+
     spriteImage.onload = () => {
       spriteLoaded = true;
       spriteDiv.style.backgroundImage = `url("${spriteSrc}")`;
@@ -144,9 +176,7 @@ import { Image } from "astro:assets";
       // Listen for transition end to remove placeholder
       const handleTransitionEnd = (e: TransitionEvent) => {
         if (e.propertyName === "opacity" && e.target === spriteDiv) {
-          if (placeholderImg.parentNode) {
-            placeholderImg.remove();
-          }
+          placeholderImg?.remove();
           spriteDiv.removeEventListener("transitionend", handleTransitionEnd);
         }
       };
@@ -158,6 +188,7 @@ import { Image } from "astro:assets";
       const rect = container.getBoundingClientRect();
       setFromClient(rect.left + rect.width / 2, rect.top + rect.height / 2);
     };
+
     spriteImage.src = spriteSrc;
 
     function setFromClient(clientX: number, clientY: number): void {
@@ -181,9 +212,8 @@ import { Image } from "astro:assets";
       const row = normalizedToGridIndex(clampedY);
 
       // Calculate background position
-      // Each sprite is 1/(GRID_SIZE-1) of the total
-      const xPercent = (col / (GRID_COLS - 1)) * 100;
-      const yPercent = (row / (GRID_ROWS - 1)) * 100;
+      const xPercent = (col / (GRID_SIZE - 1)) * 100;
+      const yPercent = (row / (GRID_SIZE - 1)) * 100;
 
       spriteDiv.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
       updateDebug(debugEl, clientX - rect.left, clientY - rect.top, col, row);
@@ -194,15 +224,23 @@ import { Image } from "astro:assets";
     }
 
     function handleTouchMove(e: TouchEvent): void {
-      if (e.touches && e.touches.length > 0) {
-        const t = e.touches[0];
-        setFromClient(t.clientX, t.clientY);
-      }
+      const touch = e.touches[0];
+      if (!touch) return;
+      setFromClient(touch.clientX, touch.clientY);
     }
 
     // Track pointer anywhere on the page
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
+
+    // Cleanup function to prevent memory leaks
+    const cleanup = () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+    };
+
+    // Store cleanup function on the container for potential future cleanup
+    (container as any).__faceTrackerCleanup = cleanup;
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -210,4 +248,14 @@ import { Image } from "astro:assets";
       .querySelectorAll<HTMLElement>(".face-tracker")
       .forEach((el) => initializeFaceTracker(el));
   });
+
+  // Optional: Add cleanup on page unload for SPA-like behavior
+  if (typeof window !== "undefined") {
+    window.addEventListener("beforeunload", () => {
+      document.querySelectorAll<HTMLElement>(".face-tracker").forEach((el) => {
+        const cleanup = (el as any).__faceTrackerCleanup;
+        if (cleanup) cleanup();
+      });
+    });
+  }
 </script>
