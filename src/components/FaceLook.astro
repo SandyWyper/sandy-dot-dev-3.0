@@ -1,3 +1,8 @@
+---
+import placeholderImg from "../assets/images/sandy-face-placeholder.webp";
+import spriteImg from "../assets/images/sandy-face-grid.webp";
+---
+
 <style is:global>
   .face-tracker {
     position: relative;
@@ -9,32 +14,18 @@
     border: 6px solid var(--color-primary);
   }
 
-  .face-image {
+  .face-sprite {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    transition: opacity 0.1s ease-out;
+    background-size: 1100% 1100%; /* 11 columns × 11 rows */
+    background-repeat: no-repeat;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
   }
 
-  .face-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #666;
-    font-size: 14px;
-  }
-
-  .face-tracker-error {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    color: #e74c3c;
-    background: #fdf2f2;
-    border: 1px solid #f5c6cb;
-    border-radius: 4px;
-    padding: 20px;
+  .face-sprite.loading {
+    background-size: cover;
+    background-position: center;
   }
 
   .face-debug {
@@ -48,94 +39,132 @@
     font-family: monospace;
     font-size: 12px;
     line-height: 1.4;
+    z-index: 10;
+  }
+  .loading-ring {
+    mask-image: url("data:image/svg+xml,%3Csvg width='44' height='44' viewBox='0 0 44 44' xmlns='http://www.w3.org/2000/svg' stroke='white'%3E%3Cg fill='rgba(0, 0, 0, 0.4)' fill-rule='evenodd' stroke-width='2'%3E%3Ccircle cx='22' cy='22' r='1'%3E%3Canimate attributeName='r' begin='0s' dur='1.8s' values='1;20' calcMode='spline' keyTimes='0;1' keySplines='0.165,0.84,0.44,1' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-opacity' begin='0s' dur='1.8s' values='1;0' calcMode='spline' keyTimes='0;1' keySplines='0.3,0.61,0.355,1' repeatCount='indefinite'/%3E%3C/circle%3E%3Ccircle cx='22' cy='22' r='1'%3E%3Canimate attributeName='r' begin='-0.9s' dur='1.8s' values='1;20' calcMode='spline' keyTimes='0;1' keySplines='0.165,0.84,0.44,1' repeatCount='indefinite'/%3E%3Canimate attributeName='stroke-opacity' begin='-0.9s' dur='1.8s' values='1;0' calcMode='spline' keyTimes='0;1' keySplines='0.3,0.61,0.355,1' repeatCount='indefinite'/%3E%3C/circle%3E%3C/g%3E%3C/svg%3E") !important;
   }
 
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .face-tracker {
-      min-height: 250px;
+      width: 250px;
+      height: 250px;
     }
   }
 </style>
 <div
   class="face-tracker shadow-lg mx-auto my-12"
   id="face"
-  data-base-path="./faces/"
   data-debug="false"
+  data-placeholder-src={placeholderImg.src}
+  data-sprite-src={spriteImg.src}
 >
 </div>
 <script>
-  // Grid configuration (must match your generated images)
-  const P_MIN = -15;
-  const P_MAX = 15;
-  const STEP = 3;
-  const SIZE = 256;
+  // Sprite grid configuration
+  const GRID_SIZE = 11; // 11x11 grid
+  const GRID_COLS = 11;
+  const GRID_ROWS = 11;
 
-  function clamp(value, min, max) {
+  function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
   }
 
-  function quantizeToGrid(val) {
-    const raw = P_MIN + ((val + 1) * (P_MAX - P_MIN)) / 2; // [-1,1] -> [-15,15]
-    const snapped = Math.round(raw / STEP) * STEP;
-    return clamp(snapped, P_MIN, P_MAX);
+  function normalizedToGridIndex(normalized: number): number {
+    // Convert [-1, 1] to [0, GRID_SIZE-1]
+    // -1 maps to 0, 0 maps to 5, 1 maps to 10
+    const index = Math.round(((normalized + 1) / 2) * (GRID_SIZE - 1));
+    return clamp(index, 0, GRID_SIZE - 1);
   }
 
-  function sanitize(val) {
-    const str = Number(val).toFixed(1); // force one decimal, e.g. 0 -> 0.0
-    return str.replace("-", "m").replace(".", "p");
-  }
-
-  function gridToFilename(px, py) {
-    return `gaze_px${sanitize(px)}_py${sanitize(py)}_${SIZE}.webp`;
-  }
-
-  function updateDebug(debugEl, x, y, filename) {
+  function updateDebug(
+    debugEl: HTMLElement | null,
+    x: number,
+    y: number,
+    col: number,
+    row: number
+  ): void {
     if (!debugEl) return;
-    debugEl.innerHTML = `Mouse: (${Math.round(x)}, ${Math.round(y)})<br/>Image: ${filename}`;
+    debugEl.innerHTML = `Mouse: (${Math.round(x)}, ${Math.round(y)})<br/>Grid: col ${col}, row ${row}`;
   }
 
-  function initializeFaceTracker(container) {
-    const basePath = container.dataset.basePath || "/faces/";
+  function initializeFaceTracker(container: HTMLElement): void {
     const showDebug = String(container.dataset.debug || "false") === "true";
+    const placeholderSrc = container.dataset.placeholderSrc || "";
+    const spriteSrc = container.dataset.spriteSrc || "";
 
-    const img = document.createElement("img");
-    img.className = "face-image";
-    img.alt = "Face following gaze";
-    container.appendChild(img);
+    // Create sprite div with placeholder background
+    const spriteDiv = document.createElement("div");
+    spriteDiv.className = "face-sprite loading loading-ring loading-lg";
+    spriteDiv.style.backgroundImage = `url("${placeholderSrc}")`;
+    spriteDiv.style.width = "100%";
+    spriteDiv.style.height = "100%";
+    spriteDiv.style.backgroundSize = "cover";
+    spriteDiv.style.backgroundPosition = "center";
+    spriteDiv.setAttribute("role", "img");
+    spriteDiv.setAttribute("aria-label", "Sandy's face following your cursor");
+    container.appendChild(spriteDiv);
 
-    let debugEl = null;
+    let debugEl: HTMLElement | null = null;
     if (showDebug) {
       debugEl = document.createElement("div");
       debugEl.className = "face-debug";
       container.appendChild(debugEl);
     }
 
-    function setFromClient(clientX, clientY) {
+    let spriteLoaded = false;
+
+    // Preload sprite sheet
+    const spriteImage = new Image();
+    spriteImage.onload = () => {
+      spriteLoaded = true;
+      spriteDiv.style.backgroundImage = `url("${spriteSrc}")`;
+      spriteDiv.style.backgroundSize = "1100% 1100%"; // 11x11 grid
+      spriteDiv.style.backgroundPosition = "50% 50%"; // Start centered
+      spriteDiv.classList.remove("loading");
+      spriteDiv.classList.remove("loading-ring");
+
+      // Trigger initial position update
+      const rect = container.getBoundingClientRect();
+      setFromClient(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    };
+    spriteImage.src = spriteSrc;
+
+    function setFromClient(clientX: number, clientY: number): void {
+      if (!spriteLoaded) return;
+
       const rect = container.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
+      // Normalize to [-1, 1] range
       const nx = (clientX - centerX) / (rect.width / 2);
-      const ny = (centerY - clientY) / (rect.height / 2);
+      const ny = (centerY - clientY) / (rect.height / 2); // Inverted Y
 
       const clampedX = clamp(nx, -1, 1);
       const clampedY = clamp(ny, -1, 1);
 
-      const px = quantizeToGrid(clampedX);
-      const py = quantizeToGrid(clampedY);
+      // Convert to grid indices
+      // X: -1 (left) = col 0, +1 (right) = col 10
+      // Y: +1 (up) = row 0 (top of sprite), -1 (down) = row 10 (bottom of sprite)
+      const col = normalizedToGridIndex(clampedX);
+      const row = normalizedToGridIndex(clampedY);
 
-      const filename = gridToFilename(px, py);
-      const imagePath = `${basePath}${filename}`;
-      img.src = imagePath;
-      updateDebug(debugEl, clientX - rect.left, clientY - rect.top, filename);
+      // Calculate background position
+      // Each sprite is 1/(GRID_SIZE-1) of the total
+      const xPercent = (col / (GRID_COLS - 1)) * 100;
+      const yPercent = (row / (GRID_ROWS - 1)) * 100;
+
+      spriteDiv.style.backgroundPosition = `${xPercent}% ${yPercent}%`;
+      updateDebug(debugEl, clientX - rect.left, clientY - rect.top, col, row);
     }
 
-    function handleMouseMove(e) {
+    function handleMouseMove(e: MouseEvent): void {
       setFromClient(e.clientX, e.clientY);
     }
 
-    function handleTouchMove(e) {
+    function handleTouchMove(e: TouchEvent): void {
       if (e.touches && e.touches.length > 0) {
         const t = e.touches[0];
         setFromClient(t.clientX, t.clientY);
@@ -145,15 +174,11 @@
     // Track pointer anywhere on the page
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
-
-    // Initialize at center
-    const rect = container.getBoundingClientRect();
-    setFromClient(rect.left + rect.width / 2, rect.top + rect.height / 2);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     document
-      .querySelectorAll(".face-tracker")
+      .querySelectorAll<HTMLElement>(".face-tracker")
       .forEach((el) => initializeFaceTracker(el));
   });
 </script>
