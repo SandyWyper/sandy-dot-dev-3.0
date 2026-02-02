@@ -13,6 +13,7 @@ import { Image } from "astro:assets";
     border-radius: 1000px;
     overflow: hidden;
     border: 6px solid var(--color-primary);
+    flex: none;
   }
 
   .face-sprite {
@@ -129,7 +130,7 @@ import { Image } from "astro:assets";
     x: number,
     y: number,
     col: number,
-    row: number
+    row: number,
   ): void {
     if (!debugEl) return;
     debugEl.innerHTML = `Mouse: (${Math.round(x)}, ${Math.round(y)})<br/>Grid: col ${col}, row ${row}`;
