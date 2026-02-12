@@ -14,6 +14,8 @@
     "@tailwindcss/vite": "^4.1.12",
     "astro": "^5.13.2",
     "astrojs-service-worker": "^2.0.0",
+    "node-addon-api": "^8.5.0",
+    "node-gyp": "^12.2.0",
     "tailwindcss": "^4.1.12"
   },
   "devDependencies": {
