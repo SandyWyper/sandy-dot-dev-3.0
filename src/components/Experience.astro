@@ -1,18 +1,92 @@
 ---
 import { getCollection } from "astro:content";
 import WorkTile from "./WorkTile.astro";
+import "@splidejs/splide/css";
+import { Splide, SplideSlide } from "astro-splide";
+
 const allWorkExamples = await getCollection("work");
 ---
 
-<section class="my-12 lg:my-24">
-  <div class="max-w-7xl mx-auto px-4 lg:px-8">
-    <h2 class="text-4xl font-bold mb-16">Work</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+<section class="my-12 lg:my-24 overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    <h2 class="text-4xl font-bold mb-16 px-4 lg:px-8">Work</h2>
+
+    <Splide
+      options={{
+        type: "slide",
+        gap: "1rem",
+        perPage: 1,
+        pagination: false,
+        snap: false,
+        drag: "free",
+        arrows: false,
+
+        padding: {
+          left: "14px",
+          right: "4rem",
+        },
+        mediaQuery: "min",
+        breakpoints: {
+          500: {
+            perPage: 1,
+            gap: "2rem",
+          },
+          768: {
+            perPage: 2,
+            arrows: true,
+          },
+          1024: {
+            perPage: 3,
+            padding: {
+              left: "2rem",
+              right: "2rem",
+            },
+          },
+        },
+      }}
+    >
       {
         allWorkExamples.map((item: object, index: number) => (
-          <WorkTile item={item} />
+          <SplideSlide>
+            <WorkTile item={item} />
+          </SplideSlide>
         ))
       }
-    </div>
+    </Splide>
   </div>
 </section>
+
+<style is:global>
+  .splide__track {
+    overflow: visible;
+  }
+  .splide__arrows {
+    top: -4rem;
+    position: absolute;
+    right: 0rem;
+    flex-direction: row;
+    display: flex;
+    transform: translate(-50%, -100%);
+    gap: 2rem;
+  }
+  .splide__arrow {
+    transform: translate(0, 0);
+    position: relative;
+    background: none;
+    border-radius: 0;
+    opacity: 1;
+  }
+  .splide__arrow--prev {
+    left: 0;
+  }
+  .splide__arrow--next {
+    right: 0;
+  }
+  .splide__arrow svg {
+    width: 42px;
+    height: 42px;
+    color: var(--color-primary);
+    /* stroke: var(--color-primary); */
+    fill: var(--color-primary);
+  }
+</style>
