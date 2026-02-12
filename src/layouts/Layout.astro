@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import { themes, DEFAULT_THEME } from "../utils/themes";
 
 interface Props {
@@ -45,8 +46,11 @@ const themesJson = JSON.stringify(themes);
       })();
     </script>
   </head>
-  <body class="bg-base-100 text-base-content max-w-screen">
+  <body class="bg-base-100 text-base-content max-w-screen flex flex-col min-h-screen">
     <Header />
-    <slot />
+    <main class="flex-1">
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>

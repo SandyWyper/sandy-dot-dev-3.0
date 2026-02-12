@@ -1,0 +1,27 @@
+---
+import LinkedInIcon from "./LinkedInIcon.astro";
+import GitHubIcon from "./GitHubIcon.astro";
+
+interface Props {
+  email?: string;
+}
+
+const { email = "sandywyper@gmail.com" } = Astro.props;
+---
+
+<footer
+  class="footer footer-start bg-base-200 text-base-content py-18 lg:py-24 mt-12"
+>
+  <aside
+    class="flex flex-col items-end gap-4 max-w-7xl mx-auto px-4 lg:px-8 w-full"
+  >
+    <a href={`mailto:${email}`} class="link link-hover text-xl">
+      {email}
+    </a>
+    <!-- <h4 class="mt-0 text-xl text-right">Newquay<br />Cornwall<br />England</h4> -->
+    <div class="flex gap-4">
+      <LinkedInIcon />
+      <GitHubIcon />
+    </div>
+  </aside>
+</footer>
