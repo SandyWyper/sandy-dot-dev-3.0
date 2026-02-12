@@ -5,16 +5,14 @@ const { data } = item;
 const imageSrc = data.cover;
 ---
 
-<div
-  class="card bg-base-100 shadow-sm hover:shadow-lg transition-shadow duration-300 border-primary"
->
-  <figure class="w-full h-64 p-3">
+<div class="card bg-base-100 w-full border-2 border-primary">
+  <figure class="w-full h-64">
     {
       imageSrc ? (
         <Image
           src={imageSrc}
           alt={data.coverAlt || data.title}
-          class="object-cover h-full w-full rounded-lg rounded-b-none"
+          class="object-cover h-full w-full"
         />
       ) : (
         <div class="w-full h-full bg-gray-200" />
@@ -44,3 +42,36 @@ const imageSrc = data.cover;
     </div>
   </div>
 </div>
+
+<style is:global>
+  .splide__track {
+    overflow: visible;
+  }
+  .splide__arrows {
+    top: -4rem;
+    position: absolute;
+    right: 0rem;
+    flex-direction: row;
+    display: flex;
+    transform: translate(-50%, -100%);
+    gap: 2rem;
+  }
+  .splide__arrow {
+    transform: translate(0, 0);
+    position: relative;
+    background: none;
+    border-radius: 0;
+    opacity: 1;
+  }
+  .splide__arrow--prev {
+    left: 0;
+  }
+  .splide__arrow--next {
+    right: 0;
+  }
+  .splide__arrow svg {
+    width: 32px;
+    height: 32px;
+    fill: var(--color-primary);
+  }
+</style>
