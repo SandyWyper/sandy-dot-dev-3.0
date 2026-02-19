@@ -14,6 +14,22 @@ import { Image } from "astro:assets";
     overflow: hidden;
     border: 6px solid var(--color-primary);
     flex: none;
+    cursor: none;
+  }
+
+  .fly-cursor-face {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    background: url("/fly.svg") center/contain no-repeat;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .fly-cursor-face.visible {
+    opacity: 1;
   }
 
   .face-sprite {
@@ -228,8 +244,31 @@ import { Image } from "astro:assets";
       updateDebug(debugEl, clientX - rect.left, clientY - rect.top, col, row);
     }
 
+    const flyCursor = document.createElement("div");
+    flyCursor.className = "fly-cursor-face";
+    flyCursor.setAttribute("aria-hidden", "true");
+    document.body.appendChild(flyCursor);
+
+    const flySound = new Audio("/fly.mp3");
+    flySound.loop = true;
+
     function handleMouseMove(e: MouseEvent): void {
       setFromClient(e.clientX, e.clientY);
+      const rect = container.getBoundingClientRect();
+      const isOver =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+      if (isOver) {
+        flyCursor.style.left = `${e.clientX - 16}px`;
+        flyCursor.style.top = `${e.clientY - 16}px`;
+        flyCursor.classList.add("visible");
+        flySound.play().catch(() => {});
+      } else {
+        flyCursor.classList.remove("visible");
+        flySound.pause();
+      }
     }
 
     function handleTouchMove(e: TouchEvent): void {
@@ -246,6 +285,8 @@ import { Image } from "astro:assets";
     const cleanup = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
+      flySound.pause();
+      flyCursor.remove();
     };
 
     // Store cleanup function on the container for potential future cleanup
