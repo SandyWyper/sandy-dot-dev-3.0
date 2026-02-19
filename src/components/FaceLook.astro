@@ -32,6 +32,26 @@ import { Image } from "astro:assets";
     opacity: 1;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .face-tracker {
+      cursor: auto;
+    }
+
+    .fly-cursor-face {
+      display: none;
+    }
+
+    .face-sprite {
+      transition: none;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .face-sprite {
+      transition: none;
+    }
+  }
+
   .face-sprite {
     position: absolute;
     top: 0;
@@ -152,9 +172,14 @@ import { Image } from "astro:assets";
     debugEl.innerHTML = `Mouse: (${Math.round(x)}, ${Math.round(y)})<br/>Grid: col ${col}, row ${row}`;
   }
 
+  function prefersReducedMotion(): boolean {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
   function initializeFaceTracker(container: HTMLElement): void {
     const showDebug = container.dataset.debug === "true";
     const spriteSrc = container.dataset.spriteSrc || "";
+    const reducedMotion = prefersReducedMotion();
 
     if (!spriteSrc) {
       console.error("Sprite source not provided");
@@ -172,7 +197,10 @@ import { Image } from "astro:assets";
     const spriteDiv = document.createElement("div");
     spriteDiv.className = "face-sprite";
     spriteDiv.setAttribute("role", "img");
-    spriteDiv.setAttribute("aria-label", "Sandy's face following your cursor");
+    spriteDiv.setAttribute(
+      "aria-label",
+      reducedMotion ? "Sandy's face" : "Sandy's face following your cursor",
+    );
     container.appendChild(spriteDiv);
 
     let debugEl: HTMLElement | null = null;
@@ -217,7 +245,7 @@ import { Image } from "astro:assets";
     spriteImage.src = spriteSrc;
 
     function setFromClient(clientX: number, clientY: number): void {
-      if (!spriteLoaded) return;
+      if (!spriteLoaded || reducedMotion) return;
 
       const rect = container.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
