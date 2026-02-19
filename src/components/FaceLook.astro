@@ -46,6 +46,17 @@ import { Image } from "astro:assets";
     }
   }
 
+  /* Fly cursor only on pointer devices (desktop); touch devices get default cursor */
+  @media (hover: none), (pointer: coarse) {
+    .face-tracker {
+      cursor: auto;
+    }
+
+    .fly-cursor-face {
+      display: none;
+    }
+  }
+
   @media (prefers-reduced-transparency: reduce) {
     .face-sprite {
       transition: none;
@@ -176,6 +187,10 @@ import { Image } from "astro:assets";
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
+  function isPointerDevice(): boolean {
+    return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+  }
+
   function initializeFaceTracker(container: HTMLElement): void {
     const showDebug = container.dataset.debug === "true";
     const spriteSrc = container.dataset.spriteSrc || "";
@@ -272,30 +287,49 @@ import { Image } from "astro:assets";
       updateDebug(debugEl, clientX - rect.left, clientY - rect.top, col, row);
     }
 
-    const flyCursor = document.createElement("div");
-    flyCursor.className = "fly-cursor-face";
-    flyCursor.setAttribute("aria-hidden", "true");
-    document.body.appendChild(flyCursor);
+    const pointerDevice = isPointerDevice();
+    let flyCursor: HTMLElement | null = null;
+    let flySound: HTMLAudioElement | null = null;
+    let unlockAudio: (() => void) | null = null;
 
-    const flySound = new Audio("/fly.mp3");
-    flySound.loop = true;
+    if (pointerDevice && !reducedMotion) {
+      flyCursor = document.createElement("div");
+      flyCursor.className = "fly-cursor-face";
+      flyCursor.setAttribute("aria-hidden", "true");
+      document.body.appendChild(flyCursor);
+
+      flySound = new Audio("/fly.mp3");
+      flySound.loop = true;
+
+      unlockAudio = () => {
+        if (flySound) {
+          flySound.play().then(() => flySound!.pause()).catch(() => {});
+          document.removeEventListener("click", unlockAudio!);
+          document.removeEventListener("touchstart", unlockAudio!);
+        }
+      };
+      document.addEventListener("click", unlockAudio, { once: true });
+      document.addEventListener("touchstart", unlockAudio, { once: true });
+    }
 
     function handleMouseMove(e: MouseEvent): void {
       setFromClient(e.clientX, e.clientY);
-      const rect = container.getBoundingClientRect();
-      const isOver =
-        e.clientX >= rect.left &&
-        e.clientX <= rect.right &&
-        e.clientY >= rect.top &&
-        e.clientY <= rect.bottom;
-      if (isOver) {
-        flyCursor.style.left = `${e.clientX - 16}px`;
-        flyCursor.style.top = `${e.clientY - 16}px`;
-        flyCursor.classList.add("visible");
-        flySound.play().catch(() => {});
-      } else {
-        flyCursor.classList.remove("visible");
-        flySound.pause();
+      if (flyCursor && flySound) {
+        const rect = container.getBoundingClientRect();
+        const isOver =
+          e.clientX >= rect.left &&
+          e.clientX <= rect.right &&
+          e.clientY >= rect.top &&
+          e.clientY <= rect.bottom;
+        if (isOver) {
+          flyCursor.style.left = `${e.clientX - 16}px`;
+          flyCursor.style.top = `${e.clientY - 16}px`;
+          flyCursor.classList.add("visible");
+          flySound.play().catch(() => {});
+        } else {
+          flyCursor.classList.remove("visible");
+          flySound.pause();
+        }
       }
     }
 
@@ -313,8 +347,12 @@ import { Image } from "astro:assets";
     const cleanup = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
-      flySound.pause();
-      flyCursor.remove();
+      if (unlockAudio) {
+        document.removeEventListener("click", unlockAudio);
+        document.removeEventListener("touchstart", unlockAudio);
+      }
+      if (flySound) flySound.pause();
+      if (flyCursor) flyCursor.remove();
     };
 
     // Store cleanup function on the container for potential future cleanup
