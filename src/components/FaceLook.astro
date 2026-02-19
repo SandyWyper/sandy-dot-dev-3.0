@@ -309,6 +309,7 @@ import { Image } from "astro:assets";
 
       flySound = new Audio("/fly.mp3");
       flySound.loop = true;
+      flySound.volume = 0.5;
 
       // Browsers require user gesture (click/tap) before audio can play. Hover does not count.
       // Unlock on first click/tap so subsequent hover-triggered play() succeeds.
