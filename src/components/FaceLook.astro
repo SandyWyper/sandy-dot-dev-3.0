@@ -32,6 +32,7 @@ import { Image } from "astro:assets";
     opacity: 1;
   }
 
+  /* Accessibility: reduced motion – static face, no fly cursor, instant transitions */
   @media (prefers-reduced-motion: reduce) {
     .face-tracker {
       cursor: auto;
@@ -46,7 +47,7 @@ import { Image } from "astro:assets";
     }
   }
 
-  /* Fly cursor only on pointer devices (desktop); touch devices get default cursor */
+  /* Touch/coarse pointer: no fly cursor; fallback for when JS hasn't created it yet */
   @media (hover: none), (pointer: coarse) {
     .face-tracker {
       cursor: auto;
@@ -57,6 +58,7 @@ import { Image } from "astro:assets";
     }
   }
 
+  /* Accessibility: reduced transparency – instant sprite fade, no opacity transition */
   @media (prefers-reduced-transparency: reduce) {
     .face-sprite {
       transition: none;
@@ -131,35 +133,39 @@ import { Image } from "astro:assets";
    * Face Tracker Component
    *
    * Creates an interactive face sprite that follows the user's cursor across the page.
-   * Uses an 11x11 sprite sheet grid where each frame shows the face looking in a different direction.
+   * Uses an 11x11 sprite sheet grid where each frame shows the face looking in a
+   * different direction.
    *
    * Features:
-   * - Smooth cursor tracking with immediate response
-   * - Progressive image loading (placeholder → sprite sheet)
-   * - Touch and mouse support
-   * - Optional debug mode showing cursor position and grid coordinates
-   * - Memory leak prevention with proper cleanup
-   * - Error handling for sprite loading failures
+   * - Face sprite tracking: smooth cursor/pointer tracking with immediate response
+   * - Fly cursor (desktop only): custom fly image replaces cursor when hovering face
+   * - Fly sound (desktop only): looping buzz plays while hovering face
+   * - Progressive image loading: placeholder → sprite sheet
+   * - Mouse and touch support for face tracking; fly cursor/sound on pointer devices only
+   * - Accessibility: respects prefers-reduced-motion (static face, no fly, no sound)
+   * - Optional debug mode: cursor position and grid coordinates
    * - Astro view transitions support (re-initializes on navigation)
    *
    * Lifecycle & Navigation:
-   * - Listens to both DOMContentLoaded (initial load) and astro:page-load (view transitions)
-   * - Properly cleans up event listeners and DOM elements before re-initializing
-   * - Uses requestAnimationFrame to ensure DOM is ready after view transition swaps
-   * - Handles cleanup on page unload to prevent memory leaks
+   * - Listens to DOMContentLoaded (initial load) and astro:page-load (view transitions)
+   * - Re-initializes when prefers-reduced-motion changes
+   * - Cleans up event listeners and DOM before re-initializing
+   * - Uses requestAnimationFrame for DOM readiness after view transition swaps
    *
-   * How it works:
-   * 1. Loads a low-res placeholder image first for instant visibility
-   * 2. Preloads the sprite sheet in the background
-   * 3. Converts cursor position to normalized coordinates [-1, 1]
-   * 4. Maps coordinates to grid indices [0, 10]
-   * 5. Updates background-position to show the correct sprite frame
-   * 6. Fades out placeholder once sprite is loaded
-   * 7. On navigation, cleans up and re-initializes to work with Astro view transitions
+   * Face sprite flow:
+   * 1. Load placeholder image for instant visibility
+   * 2. Preload sprite sheet in background
+   * 3. Convert cursor position to normalized [-1, 1]
+   * 4. Map to grid indices [0, 10] and update background-position
+   * 5. Fade out placeholder when sprite loads
+   *
+   * Fly cursor/sound (desktop/pointer devices only, when not reduced-motion):
+   * - Custom fly cursor shown when hovering face; buzzing sound loops
+   * - Audio requires user gesture (click/tap) to unlock; one-time listeners handle this
+   * - Touch devices: fly and sound disabled; face tracking still works via touch
    */
 
-  // Sprite grid configuration
-  const GRID_SIZE = 11; // 11x11 grid
+  const GRID_SIZE = 11; // 11×11 sprite sheet (121 frames)
 
   function clamp(value: number, min: number, max: number): number {
     return Math.max(min, Math.min(max, value));
@@ -183,10 +189,12 @@ import { Image } from "astro:assets";
     debugEl.innerHTML = `Mouse: (${Math.round(x)}, ${Math.round(y)})<br/>Grid: col ${col}, row ${row}`;
   }
 
+  /** True when user has enabled reduced motion in OS/browser settings. */
   function prefersReducedMotion(): boolean {
     return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
+  /** True when device has fine pointer (e.g. mouse) and can hover; false for touch-only. */
   function isPointerDevice(): boolean {
     return window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   }
@@ -287,6 +295,7 @@ import { Image } from "astro:assets";
       updateDebug(debugEl, clientX - rect.left, clientY - rect.top, col, row);
     }
 
+    // Fly cursor and sound: desktop/pointer devices only; skipped when reduced-motion
     const pointerDevice = isPointerDevice();
     let flyCursor: HTMLElement | null = null;
     let flySound: HTMLAudioElement | null = null;
@@ -301,9 +310,14 @@ import { Image } from "astro:assets";
       flySound = new Audio("/fly.mp3");
       flySound.loop = true;
 
+      // Browsers require user gesture (click/tap) before audio can play. Hover does not count.
+      // Unlock on first click/tap so subsequent hover-triggered play() succeeds.
       unlockAudio = () => {
         if (flySound) {
-          flySound.play().then(() => flySound!.pause()).catch(() => {});
+          flySound
+            .play()
+            .then(() => flySound!.pause())
+            .catch(() => {});
           document.removeEventListener("click", unlockAudio!);
           document.removeEventListener("touchstart", unlockAudio!);
         }
@@ -355,57 +369,43 @@ import { Image } from "astro:assets";
       if (flyCursor) flyCursor.remove();
     };
 
-    // Store cleanup function on the container for potential future cleanup
     (container as any).__faceTrackerCleanup = cleanup;
   }
 
   /**
    * Initialize or re-initialize all face trackers on the page.
-   * Called on initial page load and after each Astro view transition navigation.
-   * Ensures proper cleanup before re-initializing to prevent duplicate event listeners.
+   * Called on: initial load (DOMContentLoaded), view transitions (astro:page-load),
+   * and when prefers-reduced-motion changes.
+   * Cleans up existing trackers before re-init to prevent duplicate listeners.
    */
   function initFaceTrackers() {
-    // Clean up any existing trackers first to prevent duplicates
     document.querySelectorAll<HTMLElement>(".face-tracker").forEach((el) => {
-      // Remove event listeners
       const cleanup = (el as any).__faceTrackerCleanup;
       if (cleanup) {
         cleanup();
         delete (el as any).__faceTrackerCleanup;
       }
-      // Remove any existing sprite divs that might have been added
       const existingSprite = el.querySelector(".face-sprite");
       if (existingSprite) existingSprite.remove();
       const existingDebug = el.querySelector(".face-debug");
       if (existingDebug) existingDebug.remove();
     });
 
-    // Small delay to ensure DOM is fully ready after view transition swap
-    // This is especially important for astro:page-load events
     requestAnimationFrame(() => {
-      // Initialize all face trackers
       document
         .querySelectorAll<HTMLElement>(".face-tracker")
-        .forEach((el) => initializeFaceTracker(el));
+        .forEach(initializeFaceTracker);
     });
   }
 
-  // Handle initial page load
-  // DOMContentLoaded fires only on the first page load
+  // Init on load, navigation, and when reduced-motion preference changes
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initFaceTrackers);
   } else {
-    // DOM already loaded (e.g., script loaded after DOM ready), initialize immediately
     initFaceTrackers();
   }
-
-  // Handle Astro view transitions navigation
-  // astro:page-load fires on every navigation when view transitions are enabled
-  // This ensures the face tracker re-initializes when navigating back to pages containing it
   document.addEventListener("astro:page-load", initFaceTrackers);
 
-  // Cleanup on page unload to prevent memory leaks
-  // This is especially important for SPA-like behavior with view transitions
   if (typeof window !== "undefined") {
     window.addEventListener("beforeunload", () => {
       document.querySelectorAll<HTMLElement>(".face-tracker").forEach((el) => {
