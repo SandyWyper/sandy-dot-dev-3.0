@@ -20,13 +20,9 @@ live: "https://sandywyper.github.io/Hack-a-Game/"
 
 **Cat Quiz** is a 10-question multiple-choice game where you can switch between cat and dog rounds. Each question shows breed images (fetched from [API Ninjas](https://api-ninjas.com/)) and three options. The app tracks your score, gives immediate feedback, and ends with a results screen and a confetti effect.
 
-![Cat Quiz start screen](image-1.png)
-
 ![Quiz question with breed image and options](image-2.png)
 
 ![Quiz in progress](image-3.png)
-
-![Results and score](image-4.png)
 
 ### Design and UX
 
@@ -39,6 +35,8 @@ The site was designed to be playful and easy to use: warm yellows and oranges, s
 - **External:** [@tsparticles/confetti](https://www.npmjs.com/package/@tsparticles/confetti) (v3.0.3) for the end-of-quiz celebration; [Google Fonts](https://fonts.google.com/) and [Font Awesome](https://fontawesome.com/) for type and icons.
 
 Working together on this was a good lesson in coordinating as a team—especially managing Git and merges across several people.
+
+![Results and score](image-4.png)
 
 ### Collaborators
 
